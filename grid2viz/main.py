@@ -43,7 +43,17 @@ ARG_CONFIG_PATH_DESC = "Path to the configuration file config.ini."
 ARG_ACTIVATE_BETA_DESC = "Enable beta features. (default to False)"
 
 
-def main():
+def main(
+        use_fnc_args=False,
+        env_path=None,
+        agents_path=None,
+        cache_only=False,
+        port=None,
+        debug=None,
+        n_cores=None,
+        warm_start=None,
+        config_path=None
+    ):
     parser_main = argparse.ArgumentParser(description="Grid2Viz")
     parser_main.add_argument(
         "--agents_path",
@@ -77,6 +87,24 @@ def main():
     )
 
     args = parser_main.parse_args()
+
+    if use_fnc_args:
+        if env_path is not None:
+            args.env_path = env_path
+        if agents_path is not None:
+            args.agents_path = agents_path
+        if cache_only is not None:
+            args.cache = cache_only
+        if port is not None:
+            args.port = port
+        if debug is not None:
+            args.debug = debug
+        if n_cores is not None:
+            args.n_cores = n_cores
+        if warm_start is not None:
+            args.warm_start = warm_start
+        if config_path is not None:
+            args.config_path = config_path
 
     pkg_root_dir = os.path.dirname(os.path.abspath(__file__))
     os.environ["GRID2VIZ_ROOT"] = pkg_root_dir
@@ -184,8 +212,9 @@ def main():
         app_run(args.port, args.debug, page)
 
 
-
-
-
 if __name__ == "__main__":
-    main()
+    main(
+        use_fnc_args=True,
+        env_path=r"C:\Users\vrenault\data_grid2op\l2rpn_idf_2023",
+        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_small"
+    )
