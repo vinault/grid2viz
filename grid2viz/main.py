@@ -54,6 +54,8 @@ def main(
         warm_start=None,
         config_path=None
     ):
+
+    print("Coucou Nicolas")
     parser_main = argparse.ArgumentParser(description="Grid2Viz")
     parser_main.add_argument(
         "--agents_path",
