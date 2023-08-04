@@ -1,6 +1,7 @@
 grid2viz/data/agents_dev
 grid2viz/data/agents_multi_topo
 grid2viz/data/agents_test_env_1.2.3
+poetry.lock
 
 grid2viz/main_VR.py
 

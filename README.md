@@ -1,4 +1,15 @@
 
+# EDIT L2RPN-IDF challenge
+
+## Install
+```commandline
+poetry install
+poetry run pip install grid2op==1.9.3
+```
+
+## Run
+Run grid2viz.main.main with use_fnc_args=True and your command line arguments
+
 # Grid2Viz: The Grid2Op Visualization companion app
 
 Grid2Viz is a web application that offers several interactive views into the results of Reinforcement Learning agents that ran on the [Grid2Op](https://github.com/rte-france/Grid2Op) platform. It is part of the [GridAlive](https://github.com/rte-france/gridAlive) lab ecosystem.
