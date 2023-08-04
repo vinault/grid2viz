@@ -351,7 +351,7 @@ def register_callbacks_macro(app):
             for col in table.columns
             if col not in cols_to_exclude
         ]
-        return cols, table.to_dict("record")
+        return cols, table.to_dict("records")
 
     @app.callback(
         [
