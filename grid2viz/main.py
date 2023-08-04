@@ -19,6 +19,12 @@ CONFIG_FILE_CONTENT = """
 agents_dir={agents_dir}
 env_dir={env_dir}
 n_cores={n_cores}
+[WARMSTART]
+scenario={scenario}
+agent_ref={agent_ref}
+agent_study={agent_study}
+page={page}
+time_step={time_step}
 # This file will be re generated to each call of "python -m grid2viz.main"
 """
 
@@ -52,6 +58,7 @@ def main(
         debug=None,
         n_cores=None,
         warm_start=None,
+        warm_start_params=None,
         config_path=None
     ):
 
@@ -146,12 +153,34 @@ def main(
 
     n_cores = args.n_cores
 
-    with open(config_path, "w") as f:
-        f.write(
-            CONFIG_FILE_CONTENT.format(
-                agents_dir=agents_dir, env_dir=env_dir, n_cores=n_cores
+    if args.warm_start:
+        with open(config_path, "w") as f:
+            f.write(
+                CONFIG_FILE_CONTENT.format(
+                    agents_dir=agents_dir,
+                    env_dir=env_dir,
+                    n_cores=n_cores,
+                    scenario=warm_start_params["scenario"],
+                    agent_ref=warm_start_params["agent_ref"],
+                    agent_study=warm_start_params["agent_study"],
+                    page=warm_start_params["page"],
+                    time_step=warm_start_params["time_step"],
+                )
             )
-        )
+    else:
+        with open(config_path, "w") as f:
+            f.write(
+                CONFIG_FILE_CONTENT.format(
+                    agents_dir=agents_dir,
+                    env_dir=env_dir,
+                    n_cores=n_cores,
+                    scenario="",
+                    agent_ref="",
+                    agent_study="",
+                    page="",
+                    time_step=0,
+                )
+            )
 
     is_makeCache_only = args.cache
     activate_beta = args.activate_beta
@@ -176,6 +205,7 @@ def main(
                     "Cannot warmstart without a configuration provided with --config-path"
                 )
             parser = configparser.ConfigParser()
+            print(args.config_path)
             parser.read(args.config_path)
             try:
                 scenario = parser.get("WARMSTART", "scenario")
@@ -218,5 +248,14 @@ if __name__ == "__main__":
     main(
         use_fnc_args=True,
         env_path=r"C:\Users\vrenault\data_grid2op\l2rpn_idf_2023",
-        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_small"
+        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_small",
+        config_path=r"D:\l2rpn\grid2viz\grid2viz\config.ini",
+        warm_start=True,
+        warm_start_params={
+            "scenario": "2035-01-01_0",
+            "agent_ref": "20230803-0716 DoNothing",
+            "agent_study": "20230802-1822 GeneralTutorByArea",
+            "page": "macro",
+            "time_step": 0
+        }
     )

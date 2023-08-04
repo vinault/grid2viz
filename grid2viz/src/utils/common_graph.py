@@ -421,17 +421,17 @@ def make_action_ts(study_agent, ref_agent, scenario, layout_topology_def=None,la
         name=study_agent+"dispatch",
     )
 
-    curtail_distance_trace = go.Scatter(
-        x=study_action_df.timestamp,
-        y=study_action_df["curtail_impact"],#.cumsum(),
-        name=study_agent+"curtail",
-    )
-
-    storage_distance_trace = go.Scatter(
-        x=study_action_df.timestamp,
-        y=study_action_df["storage_impact"],  # .cumsum(),#cumulative redispatchinh over time
-        name=study_agent+"storage",
-    )
+    # curtail_distance_trace = go.Scatter(
+    #     x=study_action_df.timestamp,
+    #     y=study_action_df["curtail_impact"],#.cumsum(),
+    #     name=study_agent+"curtail",
+    # )
+    #
+    # storage_distance_trace = go.Scatter(
+    #     x=study_action_df.timestamp,
+    #     y=study_action_df["storage_impact"],  # .cumsum(),#cumulative redispatchinh over time
+    #     name=study_agent+"storage",
+    # )
 
     ref_dispatch_distance_trace = go.Scatter(
         x=ref_action_df.timestamp,
@@ -439,28 +439,28 @@ def make_action_ts(study_agent, ref_agent, scenario, layout_topology_def=None,la
         name=ref_agent+"dispatch",
     )
 
-    ref_curtail_distance_trace = go.Scatter(
-        x=ref_action_df.timestamp,
-        y=ref_action_df["curtail_impact"],#.cumsum(),
-        name=ref_agent+"curtail",
-    )
-
-    ref_storage_distance_trace = go.Scatter(
-        x=ref_action_df.timestamp,
-        y=ref_action_df["storage_impact"],#.cumsum(),#cumulative redispatchinh over time
-        name=ref_agent+"storage",
-    )
+    # ref_curtail_distance_trace = go.Scatter(
+    #     x=ref_action_df.timestamp,
+    #     y=ref_action_df["curtail_impact"],#.cumsum(),
+    #     name=ref_agent+"curtail",
+    # )
+    #
+    # ref_storage_distance_trace = go.Scatter(
+    #     x=ref_action_df.timestamp,
+    #     y=ref_action_df["storage_impact"],#.cumsum(),#cumulative redispatchinh over time
+    #     name=ref_agent+"storage",
+    # )
 
     #layout_dispatch_def.update(xaxis=dict(range=[dispatch_distance_trace.x[0], dispatch_distance_trace.x[-1]]))
     figure_dispatch = {
         "data": [
             dispatch_distance_trace,
-            curtail_distance_trace,
-            storage_distance_trace,
+            # curtail_distance_trace,
+            # storage_distance_trace,
             action_trace,
             ref_dispatch_distance_trace,
-            ref_curtail_distance_trace,
-            ref_storage_distance_trace,
+            # ref_curtail_distance_trace,
+            # ref_storage_distance_trace,
             ref_action_trace
         ],
         "layout": layout_topology_def,

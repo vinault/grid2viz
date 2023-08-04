@@ -36,32 +36,32 @@ class ActionImpacts:
         action_line,
         action_subs,
         action_redisp,
-        action_curtail,
-        action_storage,
+        # action_curtail,
+        # action_storage,
         redisp_impact,
-        curtail_impact,
-        storage_impact,
+        # curtail_impact,
+        # storage_impact,
         line_name,
         sub_name,
         gen_name,
-        ren_name,
-        storage_name,
+        # ren_name,
+        # storage_name,
         action_id,
     ):
 
         self.action_line = action_line
         self.action_subs = action_subs
         self.action_redisp = action_redisp
-        self.action_curtail=action_curtail
-        self.action_storage = action_storage
+        # self.action_curtail=action_curtail
+        # self.action_storage = action_storage
         self.redisp_impact = redisp_impact
-        self.curtail_impact=curtail_impact
-        self.storage_impact = storage_impact
+        # self.curtail_impact=curtail_impact
+        # self.storage_impact = storage_impact
         self.line_name = line_name
         self.sub_name = sub_name
         self.gen_name = gen_name
-        self.ren_name = ren_name
-        self.storage_name = storage_name
+        # self.ren_name = ren_name
+        # self.storage_name = storage_name
         self.action_id = action_id
 
 
@@ -156,24 +156,24 @@ class EpisodeAnalytics:
                 "action_line",
                 "action_subs",
                 "action_redisp",
-                "action_curtail",
-                "action_storage",
+                # "action_curtail",
+                # "action_storage",
                 "redisp_impact",
-                "curtail_impact",
-                "storage_impact",
+                # "curtail_impact",
+                # "storage_impact",
                 "line_name",
                 "sub_name",
                 "gen_name",
-                "ren_name",
-                "storage_name",
+                # "ren_name",
+                # "storage_name",
                 "distance",
                 "lines_modified",
                 "subs_modified",
                 "is_alarm",
                 "alarm_zone",
                 "gens_modified",
-                "rens_modified",
-                "storages_modified"
+                # "rens_modified",
+                # "storages_modified"
             ]
         action_data_table = pd.DataFrame(
             index=range(size),
@@ -242,10 +242,10 @@ class EpisodeAnalytics:
                 subs_modified,
                 gens_modified_names,
                 gens_modified_ids,
-                ren_modified_names,
-                ren_modified_ids,
-                storage_modified_names,
-                storage_modified_ids
+                # ren_modified_names,
+                # ren_modified_ids,
+                # storage_modified_names,
+                # storage_modified_ids
 
             ) = self.compute_action_impacts(
                 act, list_actions, obs, gens_modified_ids, actual_redispatch_previous_ts
@@ -291,24 +291,24 @@ class EpisodeAnalytics:
                 action_impacts.action_line,
                 action_impacts.action_subs,
                 action_impacts.action_redisp,
-                action_impacts.action_curtail,
-                action_impacts.action_storage,
+                # action_impacts.action_curtail,
+                # action_impacts.action_storage,
                 action_impacts.redisp_impact,
-                action_impacts.curtail_impact,
-                action_impacts.storage_impact,
+                # action_impacts.curtail_impact,
+                # action_impacts.storage_impact,
                 action_impacts.line_name,
                 action_impacts.sub_name,
                 action_impacts.gen_name,
-                action_impacts.ren_name,
-                action_impacts.storage_name,
+                # action_impacts.ren_name,
+                # action_impacts.storage_name,
                 distance,
                 lines_modified,
                 subs_modified,
                 is_alarm,
                 alarm_zone,
                 gens_modified_names,
-                ren_modified_names,
-                storage_modified_names
+                # ren_modified_names,
+                # storage_modified_names
             ]
 
 
@@ -667,27 +667,27 @@ class EpisodeAnalytics:
             action, observation, gens_modified_ids, actual_dispatch_previous_ts
         )
 
-        (
-            n_ren_modified,
-            str_ren_modified,
-            ren_modified_names,
-            ren_modified_ids,
-            volume_curtailed,
-        ) = self.get_curtailment_modifications(
-            action, observation
-        )
+        # (
+        #     n_ren_modified,
+        #     str_ren_modified,
+        #     ren_modified_names,
+        #     ren_modified_ids,
+        #     volume_curtailed,
+        # ) = self.get_curtailment_modifications(
+        #     action, observation
+        # )
 
-        (
-            n_storage_modified,
-            str_storage_modified,
-            storage_modified_names,
-            storage_modified_ids,
-            volume_stored,
-
-        ) = self.get_storage_modifications(
-            action,
-            observation
-        )
+        # (
+        #     n_storage_modified,
+        #     str_storage_modified,
+        #     storage_modified_names,
+        #     storage_modified_ids,
+        #     volume_stored,
+        #
+        # ) = self.get_storage_modifications(
+        #     action,
+        #     observation
+        # )
 
 
         action_id, list_actions = self.get_action_id(action, list_actions)
@@ -697,16 +697,16 @@ class EpisodeAnalytics:
                 action_line=n_lines_modified,
                 action_subs=n_subs_modified,
                 action_redisp=n_gens_modified,
-                action_curtail=n_ren_modified,
-                action_storage=n_storage_modified,
+                # action_curtail=n_ren_modified,
+                # action_storage=n_storage_modified,
                 redisp_impact=redisp_volume,
-                curtail_impact=volume_curtailed,
-                storage_impact=volume_stored,
+                # curtail_impact=volume_curtailed,
+                # storage_impact=volume_stored,
                 line_name=str_lines_modified,
                 sub_name=str_subs_modified,
                 gen_name=str_gens_modified,
-                ren_name=str_ren_modified,
-                storage_name=str_storage_modified,
+                # ren_name=str_ren_modified,
+                # storage_name=str_storage_modified,
                 action_id=action_id,
             ),
             list_actions,
@@ -714,10 +714,10 @@ class EpisodeAnalytics:
             subs_modified,
             gens_modified_names,
             gens_modified_ids,
-            ren_modified_names,
-            ren_modified_ids,
-            storage_modified_names,
-            storage_modified_ids
+            # ren_modified_names,
+            # ren_modified_ids,
+            # storage_modified_names,
+            # storage_modified_ids
         )
 
     def get_lines_modifications(self, action):

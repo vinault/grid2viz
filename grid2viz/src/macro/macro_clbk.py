@@ -155,8 +155,11 @@ def register_callbacks_macro(app):
 
     def action_repartition_pie(episode):
 
+        # actions_table = episode.action_data_table[
+        #     ["action_line", "action_subs", "action_redisp", "action_curtail","action_storage"]
+        # ]
         actions_table = episode.action_data_table[
-            ["action_line", "action_subs", "action_redisp", "action_curtail","action_storage"]
+            ["action_line", "action_subs", "action_redisp"]
         ]
         nb_actions = (actions_table > 0).sum()
 
@@ -178,8 +181,8 @@ def register_callbacks_macro(app):
                             nb_actions["action_line"],
                             nb_actions["action_subs"],
                             nb_actions["action_redisp"],
-                            nb_actions["action_curtail"],
-                            nb_actions["action_storage"]
+                            0,
+                            0
                         ],
                         sort=False
                     )
