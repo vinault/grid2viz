@@ -36,6 +36,21 @@ def register_callbacks_macro(app):
 
     # Synchronized graphs
     @app.callback(
+        Output("relayoutStoreMacro", "data"),
+        [
+            Input("rewards_timeserie", "relayoutData"),
+            Input("cumulated_rewards_timeserie", "relayoutData"),
+            Input("usage_rate_graph_study", "relayoutData"),
+            Input("action_topology_timeserie", "relayoutData"),
+            Input("action_dispatch_timeserie", "relayoutData"),
+            Input("overflow_graph_study", "relayoutData"),
+        ],
+        [State("relayoutStoreMacro", "data")],
+    )
+    def relayout_store(*args):
+        return relayout_callback(*args)
+
+    @app.callback(
         [
             Output("rewards_timeserie", "figure"),
             Output("cumulated_rewards_timeserie", "figure"),
@@ -47,7 +62,6 @@ def register_callbacks_macro(app):
         [
             Input("agent_study", "modified_timestamp"),
             Input("agent_ref", "data"),
-
             Input("relayoutStoreMacro", "data"),
         ],
         [   State("select_study_agent", "disabled"),
@@ -237,20 +251,6 @@ def register_callbacks_macro(app):
             dict(label=timestamp["Timestamps"], value=timestamp["Timestamps"])
             for timestamp in timestamps
         ]
-
-    @app.callback(
-        Output("relayoutStoreMacro", "data"),
-        [
-            Input("usage_rate_graph_study", "relayoutData"),
-            Input("action_timeserie", "relayoutData"),
-            Input("overflow_graph_study", "relayoutData"),
-            Input("rewards_timeserie", "relayoutData"),
-            Input("cumulated_rewards_timeserie", "relayoutData"),
-        ],
-        [State("relayoutStoreMacro", "data")],
-    )
-    def relayout_store(*args):
-        return relayout_callback(*args)
 
     @app.callback(
         [
