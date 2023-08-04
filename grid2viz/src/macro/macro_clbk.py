@@ -470,25 +470,25 @@ def register_callbacks_macro(app):
         act = new_episode.actions[row_id]
         return str(act)
 
-    @app.callback(
-        [
-            Output("modal_macro", "is_open"),
-            Output("dont_show_again_div_macro", "className"),
-        ],
-        [Input("close_macro", "n_clicks"), Input("page_help", "n_clicks")],
-        [State("modal_macro", "is_open"), State("dont_show_again_macro", "checked")],
-    )
-    def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
-        dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("macro")
-        return toggle_modal_helper(
-            close_n_clicks,
-            open_n_clicks,
-            is_open,
-            dont_show_again,
-            dsa_filepath,
-            "page_help",
-        )
-
-    @app.callback(Output("modal_image_macro", "src"), [Input("url", "pathname")])
-    def show_image(pathname):
-        return app.get_asset_url("screenshots/agent_overview.png")
+    # @app.callback(
+    #     [
+    #         Output("modal_macro", "is_open"),
+    #         Output("dont_show_again_div_macro", "className"),
+    #     ],
+    #     [Input("close_macro", "n_clicks"), Input("page_help", "n_clicks")],
+    #     [State("modal_macro", "is_open"), State("dont_show_again_macro", "checked")],
+    # )
+    # def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
+    #     dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("macro")
+    #     return toggle_modal_helper(
+    #         close_n_clicks,
+    #         open_n_clicks,
+    #         is_open,
+    #         dont_show_again,
+    #         dsa_filepath,
+    #         "page_help",
+    #     )
+    #
+    # @app.callback(Output("modal_image_macro", "src"), [Input("url", "pathname")])
+    # def show_image(pathname):
+    #     return app.get_asset_url("screenshots/agent_overview.png")

@@ -540,25 +540,25 @@ def register_callbacks_micro(app):
             disabled_Power_Button
         )
 
-    @app.callback(
-        [
-            Output("modal_micro", "is_open"),
-            Output("dont_show_again_div_micro", "className"),
-        ],
-        [Input("close_micro", "n_clicks"), Input("page_help", "n_clicks")],
-        [State("modal_micro", "is_open"), State("dont_show_again_micro", "checked")],
-    )
-    def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
-        dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("micro")
-        return toggle_modal_helper(
-            close_n_clicks,
-            open_n_clicks,
-            is_open,
-            dont_show_again,
-            dsa_filepath,
-            "page_help",
-        )
-
-    @app.callback(Output("modal_image_micro", "src"), [Input("url", "pathname")])
-    def show_image(pathname):
-        return app.get_asset_url("screenshots/agent_study.png")
+    # @app.callback(
+    #     [
+    #         Output("modal_micro", "is_open"),
+    #         Output("dont_show_again_div_micro", "className"),
+    #     ],
+    #     [Input("close_micro", "n_clicks"), Input("page_help", "n_clicks")],
+    #     [State("modal_micro", "is_open"), State("dont_show_again_micro", "checked")],
+    # )
+    # def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
+    #     dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("micro")
+    #     return toggle_modal_helper(
+    #         close_n_clicks,
+    #         open_n_clicks,
+    #         is_open,
+    #         dont_show_again,
+    #         dsa_filepath,
+    #         "page_help",
+    #     )
+    #
+    # @app.callback(Output("modal_image_micro", "src"), [Input("url", "pathname")])
+    # def show_image(pathname):
+    #     return app.get_asset_url("screenshots/agent_study.png")

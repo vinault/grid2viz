@@ -155,6 +155,6 @@ def layout():
             comparison_button(),
             generate_heatmap_components(survival_df, attention_df),
             dbc.Row(id="cards_container", className="m-1"),
-            modal(id_suffix="episodes", is_open=open_help, header=header, body=body),
+            # modal(id_suffix="episodes", is_open=open_help, header=header, body=body),
         ],
     )

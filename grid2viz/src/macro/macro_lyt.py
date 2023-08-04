@@ -647,6 +647,6 @@ def layout(timestamps, scenario, study_agent, ref_agent, from_scenario_selection
             indicator_line(scenario, study_agent, ref_agent),
             overview_line(timestamps, from_scenario_selection),
             inspector_line(study_agent, scenario),
-            modal(id_suffix="macro", is_open=open_help, header=header, body=body),
+            # modal(id_suffix="macro", is_open=open_help, header=header, body=body),
         ],
     )

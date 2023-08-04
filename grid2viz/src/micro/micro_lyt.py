@@ -477,6 +477,6 @@ def layout(user_selected_timestamp, study_agent, ref_agent, scenario):
             ),
             context_inspector_line(best_episode, new_episode),
             all_info_line,
-            modal(id_suffix="micro", is_open=open_help, header=header, body=body),
+            # modal(id_suffix="micro", is_open=open_help, header=header, body=body),
         ],
     )

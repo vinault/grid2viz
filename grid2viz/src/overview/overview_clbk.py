@@ -301,28 +301,28 @@ def register_callbacks_overview(app):
             episode.production["timestamp"].dt.date.values[-1],
         )
 
-    @app.callback(
-        [
-            Output("modal_overview", "is_open"),
-            Output("dont_show_again_div_overview", "className"),
-        ],
-        [Input("close_overview", "n_clicks"), Input("page_help", "n_clicks")],
-        [
-            State("modal_overview", "is_open"),
-            State("dont_show_again_overview", "checked"),
-        ],
-    )
-    def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
-        dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("overview")
-        return toggle_modal_helper(
-            close_n_clicks,
-            open_n_clicks,
-            is_open,
-            dont_show_again,
-            dsa_filepath,
-            "page_help",
-        )
-
-    @app.callback(Output("modal_image_overview", "src"), [Input("url", "pathname")])
-    def show_image(pathname):
-        return app.get_asset_url("screenshots/scenario_overview.png")
+    # @app.callback(
+    #     [
+    #         Output("modal_overview", "is_open"),
+    #         Output("dont_show_again_div_overview", "className"),
+    #     ],
+    #     [Input("close_overview", "n_clicks"), Input("page_help", "n_clicks")],
+    #     [
+    #         State("modal_overview", "is_open"),
+    #         State("dont_show_again_overview", "checked"),
+    #     ],
+    # )
+    # def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
+    #     dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("overview")
+    #     return toggle_modal_helper(
+    #         close_n_clicks,
+    #         open_n_clicks,
+    #         is_open,
+    #         dont_show_again,
+    #         dsa_filepath,
+    #         "page_help",
+    #     )
+    #
+    # @app.callback(Output("modal_image_overview", "src"), [Input("url", "pathname")])
+    # def show_image(pathname):
+    #     return app.get_asset_url("screenshots/scenario_overview.png")

@@ -347,6 +347,6 @@ def layout(scenario, ref_agent):
             indicators_line(encoded_image.decode()),
             summary_line(episode, ref_agent, scenario),
             ref_agent_line,
-            modal(id_suffix="overview", is_open=open_help, header=header, body=body),
+            # modal(id_suffix="overview", is_open=open_help, header=header, body=body),
         ],
     )

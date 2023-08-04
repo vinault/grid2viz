@@ -304,27 +304,27 @@ def register_callbacks_episodes(app):
         return scenario, "/overview"
 
 
-    @app.callback(
-        [
-            Output("modal_episodes", "is_open"),
-            Output("dont_show_again_div_episodes", "className"),
-        ],
-        [Input("close_episodes", "n_clicks"), Input("page_help", "n_clicks")],
-        [
-            State("modal_episodes", "is_open"),
-            State("dont_show_again_episodes", "checked"),
-        ],
-    )
-    def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
-        dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("episodes")
-        return toggle_modal_helper(
-            close_n_clicks,
-            open_n_clicks,
-            is_open,
-            dont_show_again,
-            dsa_filepath,
-            "page_help",
-        )
+    # @app.callback(
+    #     [
+    #         Output("modal_episodes", "is_open"),
+    #         Output("dont_show_again_div_episodes", "className"),
+    #     ],
+    #     [Input("close_episodes", "n_clicks"), Input("page_help", "n_clicks")],
+    #     [
+    #         State("modal_episodes", "is_open"),
+    #         State("dont_show_again_episodes", "checked"),
+    #     ],
+    # )
+    # def toggle_modal(close_n_clicks, open_n_clicks, is_open, dont_show_again):
+    #     dsa_filepath = Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("episodes")
+    #     return toggle_modal_helper(
+    #         close_n_clicks,
+    #         open_n_clicks,
+    #         is_open,
+    #         dont_show_again,
+    #         dsa_filepath,
+    #         "page_help",
+    #     )
 
     @app.callback(
         Output("collapse", "is_open"),
@@ -336,9 +336,9 @@ def register_callbacks_episodes(app):
             return not is_open
         return is_open
 
-    @app.callback(Output("modal_image_episodes", "src"), [Input("url", "pathname")])
-    def show_image(pathname):
-        return app.get_asset_url("screenshots/scenario_selection.png")
+    # @app.callback(Output("modal_image_episodes", "src"), [Input("url", "pathname")])
+    # def show_image(pathname):
+    #     return app.get_asset_url("screenshots/scenario_selection.png")
 
     @app.callback(
         Output("scenario_filter_div", "className"), [Input("collapse", "is_open")]
