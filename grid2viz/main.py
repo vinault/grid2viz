@@ -187,6 +187,7 @@ def main(
 
     # Inline import to load app only now
     if is_makeCache_only:
+        print(f"number of cores : {n_cores}")
         from grid2viz.src.manager import (
             scenarios,
             agents,
@@ -194,7 +195,7 @@ def main(
             cache_dir,
             make_cache
         )
-        make_cache(scenarios,agents,n_cores,cache_dir)
+        make_cache(scenarios, agents, n_cores, cache_dir)
     else:
         from grid2viz.app import app_run, define_layout_and_callbacks
 
@@ -248,14 +249,17 @@ if __name__ == "__main__":
     main(
         use_fnc_args=True,
         env_path=r"C:\Users\vrenault\data_grid2op\l2rpn_idf_2023",
-        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_small",
+        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner",
         config_path=r"D:\l2rpn\grid2viz\grid2viz\config.ini",
-        warm_start=True,
+        warm_start=False,
         warm_start_params={
-            "scenario": "2035-01-01_0",
-            "agent_ref": "20230803-0716 DoNothing",
+            "scenario": "2035-01-01_4",
+            "agent_ref": "20230802-1822 GeneralTutorByArea",
+            # "agent_ref": "20230803-0716 DoNothing",
             "agent_study": "20230802-1822 GeneralTutorByArea",
             "page": "macro",
             "time_step": 0
-        }
+        },
+        # cache_only=True,
+        n_cores=4
     )

@@ -4,7 +4,7 @@
 
 import pandas as pd
 
-from .env_actions import env_actions
+# from .env_actions import env_actions
 
 
 def get_prod_and_conso(episode):
@@ -80,11 +80,11 @@ def get_usage_rate(episode):
     )
 
 
-def init_table_inspection_data(episode):
-    ts_hazards = env_actions(episode, which="hazards", kind="ts", aggr=True)
-    ts_maintenances = env_actions(episode, which="maintenances", kind="ts", aggr=True)
-    table = ts_hazards.merge(ts_maintenances, left_index=True, right_index=True)
-    table = table.reset_index()
-    if not table.empty:
-        table["IsWorkingDay"] = table["timestamp"].dt.weekday < 5
-    return table
+# def init_table_inspection_data(episode):
+#     ts_hazards = env_actions(episode, which="hazards", kind="ts", aggr=True)
+#     ts_maintenances = env_actions(episode, which="maintenances", kind="ts", aggr=True)
+#     table = ts_hazards.merge(ts_maintenances, left_index=True, right_index=True)
+#     table = table.reset_index()
+#     if not table.empty:
+#         table["IsWorkingDay"] = table["timestamp"].dt.weekday < 5
+#     return table

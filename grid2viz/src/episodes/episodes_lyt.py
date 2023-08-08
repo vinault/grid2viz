@@ -36,6 +36,8 @@ def create_heatmap_figures(df_survival, df_attention):
     z_text = clustered_survival_df.copy().astype(str)
     z_text[z_text == "-1"] = ""
 
+    clustered_survival_df = clustered_survival_df.sort_index()
+
     heatmap_figure_survival = ff.create_annotated_heatmap(  # go.Figure(data=go.Heatmap(
         z=clustered_survival_df.values,  # survival_df.values,#z=pd.concat([survival_df, survival_df]))),
         x=clustered_survival_df.columns.tolist(),

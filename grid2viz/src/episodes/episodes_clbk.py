@@ -40,7 +40,7 @@ def register_callbacks_episodes(app):
     def load_scenario_cards(url):
         """
         Create and display html cards with scenario's kpi for
-        the 15 first scenarios using cache file.
+        the 5 first scenarios using cache file.
         """
         cards_list = []
         cards_count = 0
@@ -57,7 +57,7 @@ def register_callbacks_episodes(app):
 
         is_episode_page = url_split == "/" or url_split == "" or url_split == "episodes"
         start_time = time.time()
-        if cards_count < 15 and is_episode_page:
+        if cards_count < 5 and is_episode_page:
             sorted_scenarios = list(sorted(scenarios))
             if not os.path.exists(cache_dir):
                 print(
@@ -173,15 +173,38 @@ def register_callbacks_episodes(app):
                                                         children=[
                                                             html.P(
                                                                 className="border-bottom h3 mb-0 text-right",
-                                                                children="{} min".format(
-                                                                    round(
-                                                                        best_agent_episode.total_maintenance_duration
-                                                                    )
+                                                                children="{} / {}".format(
+                                                                    len(best_agent_episode.attacks_data_table.loc[best_agent_episode.attacks_data_table["attack"], "id_lines"].unique()),
+                                                                    round(len(best_agent_episode.attacks_data_table.loc[
+                                                                            best_agent_episode.attacks_data_table[
+                                                                                "attack"], "id_lines"].unique()) / best_agents[
+                                                                        scenario
+                                                                    ]["value"] * 2017.0)
                                                                 ),
                                                             ),
                                                             html.P(
                                                                 className="text-muted",
-                                                                children="Total Maintenance Duration",
+                                                                children="Nb of Attacks / Nb of Attacks normalized",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ]
+                                            ),
+                                            dbc.Row(
+                                                children=[
+                                                    dbc.Col(
+                                                        className="mb-4",
+                                                        children=[
+                                                            html.P(
+                                                                className="border-bottom h3 mb-0 text-right",
+                                                                children="{} / {}".format(
+                                                                    best_agent_episode.action_data_table.distance.values[-1],
+                                                                    best_agent_episode.action_data_table.distance.values.max()
+                                                                ),
+                                                            ),
+                                                            html.P(
+                                                                className="text-muted",
+                                                                children="Distance at GO / Max distance",
                                                             ),
                                                         ],
                                                     ),

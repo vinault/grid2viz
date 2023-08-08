@@ -11,7 +11,7 @@ from grid2op.Episode import EpisodeData
 from tqdm import tqdm
 
 from . import EpisodeTrace, maintenances, consumption_profiles
-from .env_actions import env_actions
+# from .env_actions import env_actions
 
 import os
 import json
@@ -23,8 +23,8 @@ from grid2op.Observation import ObservationSpace
 # TODO: configure the reward key you want to visualize in agent overview.
 # Either as an argument or a dropdown list in the app from which we can choose.
 # The reward dataframe should get bigger with all keys available anyway
-other_reward_key = "grid_operation_cost"
-
+other_reward_key = "l2rpn"
+# close_overflow, alert, l2rpn, episode_duration
 
 def compute_losses(obs):
     return (obs.prod_p.sum() - obs.load_p.sum()) / obs.load_p.sum()
@@ -66,9 +66,14 @@ class ActionImpacts:
 
 
 class EpisodeAnalytics:
-    def __init__(self, episode_data, episode_name, agent):
+    def __init__(self, episode_data, episode_name, agent, agents_path=None):
         self.episode_name = episode_name
         self.agent = agent
+        self.agents_path = agents_path
+        self.action_space_name = episode_data.ACTION_SPACE
+        self.action_space = ActionSpace.from_dict(
+            os.path.join(self.agents_path, self.action_space_name)
+        )
 
         self.timesteps = list(range(len(episode_data.actions)))
         print(
@@ -87,8 +92,9 @@ class EpisodeAnalytics:
             self.actual_redispatch,
             self.attacks_data_table,
         ) = self._make_df_from_data(episode_data)
-        print("Hazards-Maintenances")
-        self.hazards, self.maintenances = self._env_actions_as_df(episode_data)
+        del self.action_space
+        # print("Hazards-Maintenances")
+        # self.hazards, self.maintenances = self._env_actions_as_df(episode_data)
         print("Computing computation intensive indicators...")
         self.total_overflow_trace = EpisodeTrace.get_total_overflow_trace(
             self, episode_data
@@ -97,11 +103,11 @@ class EpisodeAnalytics:
         self.reward_trace = EpisodeTrace.get_df_rewards_trace(self)
         self.total_overflow_ts = EpisodeTrace.get_total_overflow_ts(self, episode_data)
         self.profile_traces = consumption_profiles.profiles_traces(self)
-        self.total_maintenance_duration = maintenances.total_duration_maintenance(self)
-        self.nb_hazards = env_actions(self, which="hazards", kind="nb", aggr=True)
-        self.nb_maintenances = env_actions(
-            self, which="maintenances", kind="nb", aggr=True
-        )
+        # self.total_maintenance_duration = maintenances.total_duration_maintenance(self)
+        # self.nb_hazards = env_actions(self, which="hazards", kind="nb", aggr=True)
+        # self.nb_maintenances = env_actions(
+        #     self, which="maintenances", kind="nb", aggr=True
+        # )
 
 
         end = time.time()
@@ -230,6 +236,7 @@ class EpisodeAnalytics:
         actual_redispatch_previous_ts = obs_0.actual_dispatch
 
         list_actions = []
+
         for (time_step, (obs, act)) in tqdm(
             enumerate(zip(episode_data.observations[:-1], episode_data.actions)),
             total=size,
@@ -277,14 +284,21 @@ class EpisodeAnalytics:
 
             pos = time_step
 
-            (
-                distance,
-                line_statuses,
-                subs_on_bus_2,
-                objs_on_bus_2,
-            ) = self.get_distance_from_obs(
-                act, line_statuses, subs_on_bus_2, objs_on_bus_2, obs_0
-            )
+            # attack = episode_data.attacks[pos]
+
+            # (
+            #     distance,
+            #     line_statuses,
+            #     subs_on_bus_2,
+            #     objs_on_bus_2,
+            # ) = self.get_distance_from_obs(
+            #     act, line_statuses, subs_on_bus_2, objs_on_bus_2, obs_0, attack
+            # )
+
+            get_back_to_ref_state_actions = self.get_back_to_ref_state(obs)
+            distance = 0
+            distance = sum(len(action_list) for action_list in get_back_to_ref_state_actions.values())
+            # distance = len(action_space.get_back_to_ref_state(obs))
 
             action_data_table.loc[pos, cols_loop_action_data_table] = [
                 action_impacts.action_id,
@@ -357,6 +371,7 @@ class EpisodeAnalytics:
 
         # TODO: we should give a choice to select different rewards among other rewards
         if episode_data.other_rewards:
+            computed_other_rewards = dict.fromkeys(episode_data.other_rewards[0].keys())
             if other_reward_key:
                 if other_reward_key in episode_data.other_rewards[0].keys():
                     computed_rewards["rewards"] = [
@@ -397,6 +412,14 @@ class EpisodeAnalytics:
             attacks_data_table,
         )
 
+    def get_back_to_ref_state(self, obs):
+        res = {}
+        # powerline actions
+        self.action_space._aux_get_back_to_ref_state_line(res, obs)
+        # substations
+        self.action_space._aux_get_back_to_ref_state_sub(res, obs)
+        return res
+
     @staticmethod
     def get_action_id(action, list_actions):
         if not action:
@@ -408,7 +431,7 @@ class EpisodeAnalytics:
         list_actions.append(action)
         return len(list_actions) - 1, list_actions
 
-    def optimize_memory_footprint(self,opt_obs_act=False):
+    def optimize_memory_footprint(self, opt_obs_act=False):
         self.flow_and_voltage_line=self.flow_and_voltage_line.astype('float16')
         self.production.equipment_name=self.production.equipment_name.astype('category')
         self.production.value = self.production.value.astype('float16')
@@ -422,17 +445,17 @@ class EpisodeAnalytics:
         self.load.timestep = self.load.timestep.astype('category')
         self.load.equipement_id = self.load.equipement_id.astype('category')
 
-        self.maintenances.line_name=self.maintenances.line_name.astype('category')
-        self.maintenances.timestep=self.maintenances.timestep.astype('category')
-        self.maintenances.timestamp = self.maintenances.timestamp.astype('category')
-        self.maintenances.line_id=self.maintenances.line_id.astype('category')
-        self.maintenances.value = self.maintenances.value.astype('bool')
-
-        self.hazards.line_name = self.hazards.line_name.astype('category')
-        self.hazards.timestep = self.hazards.timestep.astype('category')
-        self.hazards.timestamp = self.hazards.timestamp.astype('category')
-        self.hazards.line_id=self.hazards.line_id.astype('category')
-        self.hazards.value = self.hazards.value.astype('bool')
+        # self.maintenances.line_name=self.maintenances.line_name.astype('category')
+        # self.maintenances.timestep=self.maintenances.timestep.astype('category')
+        # self.maintenances.timestamp = self.maintenances.timestamp.astype('category')
+        # self.maintenances.line_id=self.maintenances.line_id.astype('category')
+        # self.maintenances.value = self.maintenances.value.astype('bool')
+        #
+        # self.hazards.line_name = self.hazards.line_name.astype('category')
+        # self.hazards.timestep = self.hazards.timestep.astype('category')
+        # self.hazards.timestamp = self.hazards.timestamp.astype('category')
+        # self.hazards.line_id=self.hazards.line_id.astype('category')
+        # self.hazards.value = self.hazards.value.astype('bool')
 
         self.rho.value=self.rho.value.astype('float16')
         self.rho.equipment = self.rho.equipment.astype('category')
@@ -468,10 +491,11 @@ class EpisodeAnalytics:
         return None
 
     def get_distance_from_obs(
-        self, act, line_statuses, subs_on_bus_2, objs_on_bus_2, obs
+        self, act, line_statuses, subs_on_bus_2, objs_on_bus_2, obs, attack
     ):
 
         impact_on_objs = act.impact_on_objects()
+        impact_on_objs_attack = attack.impact_on_objects()
 
         # lines reconnetions/disconnections
         line_statuses[
@@ -483,6 +507,19 @@ class EpisodeAnalytics:
         line_statuses[impact_on_objs["switch_line"]["powerlines"]] = np.invert(
             line_statuses[impact_on_objs["switch_line"]["powerlines"]]
         )
+
+        # attacks
+        line_statuses[
+            impact_on_objs_attack["force_line"]["disconnections"]["powerlines"]
+        ] = False
+        line_statuses[
+            impact_on_objs_attack["force_line"]["reconnections"]["powerlines"]
+        ] = True
+        line_statuses[impact_on_objs_attack["switch_line"]["powerlines"]] = np.invert(
+            line_statuses[impact_on_objs_attack["switch_line"]["powerlines"]]
+        )
+
+        line_statuses = obs.line_status
 
         topo_vect_dict = {
             "load": obs.load_pos_topo_vect,
@@ -558,41 +595,41 @@ class EpisodeAnalytics:
         return objs_on_bus_2
 
     # @jit(forceobj=True)
-    def _env_actions_as_df(self, episode_data):
-        agent_length = len(
-            episode_data.actions
-        )  # int(episode_data.meta['nb_timestep_played'])
-        hazards_size = agent_length * episode_data.n_lines
-        cols = ["timestep", "timestamp", "line_id", "line_name", "value"]
-        hazards = pd.DataFrame(index=range(hazards_size), columns=["value"], dtype=int)
-        maintenances = hazards.copy()
-
-        for (time_step, env_act) in tqdm(
-            enumerate(episode_data.env_actions), total=len(episode_data.env_actions)
-        ):
-            if env_act is None:
-                continue
-
-            time_stamp = self.timestamp(episode_data.observations[time_step])
-
-            begin = time_step * episode_data.n_lines
-            end = (time_step + 1) * episode_data.n_lines - 1
-            hazards.loc[begin:end, "value"] = env_act._hazards.astype(int)
-
-            begin = time_step * episode_data.n_lines
-            end = (time_step + 1) * episode_data.n_lines - 1
-            maintenances.loc[begin:end, "value"] = env_act._maintenance.astype(int)
-
-        hazards["timestep"] = np.repeat(range(agent_length), episode_data.n_lines)
-        maintenances["timestep"] = hazards["timestep"]
-        hazards["timestamp"] = np.repeat(self.timestamps, episode_data.n_lines)
-        maintenances["timestamp"] = hazards["timestamp"]
-        hazards["line_name"] = np.tile(episode_data.line_names, agent_length)
-        maintenances["line_name"] = hazards["line_name"]
-        hazards["line_id"] = np.tile(range(episode_data.n_lines), agent_length)
-        maintenances["line_id"] = hazards["line_id"]
-
-        return hazards, maintenances
+    # def _env_actions_as_df(self, episode_data):
+    #     agent_length = len(
+    #         episode_data.actions
+    #     )  # int(episode_data.meta['nb_timestep_played'])
+    #     hazards_size = agent_length * episode_data.n_lines
+    #     cols = ["timestep", "timestamp", "line_id", "line_name", "value"]
+    #     hazards = pd.DataFrame(index=range(hazards_size), columns=["value"], dtype=int)
+    #     maintenances = hazards.copy()
+    #
+    #     for (time_step, env_act) in tqdm(
+    #         enumerate(episode_data.env_actions), total=len(episode_data.env_actions)
+    #     ):
+    #         if env_act is None:
+    #             continue
+    #
+    #         time_stamp = self.timestamp(episode_data.observations[time_step])
+    #
+    #         begin = time_step * episode_data.n_lines
+    #         end = (time_step + 1) * episode_data.n_lines - 1
+    #         hazards.loc[begin:end, "value"] = env_act._hazards.astype(int)
+    #
+    #         begin = time_step * episode_data.n_lines
+    #         end = (time_step + 1) * episode_data.n_lines - 1
+    #         maintenances.loc[begin:end, "value"] = env_act._maintenance.astype(int)
+    #
+    #     hazards["timestep"] = np.repeat(range(agent_length), episode_data.n_lines)
+    #     maintenances["timestep"] = hazards["timestep"]
+    #     hazards["timestamp"] = np.repeat(self.timestamps, episode_data.n_lines)
+    #     maintenances["timestamp"] = hazards["timestamp"]
+    #     hazards["line_name"] = np.tile(episode_data.line_names, agent_length)
+    #     maintenances["line_name"] = hazards["line_name"]
+    #     hazards["line_id"] = np.tile(range(episode_data.n_lines), agent_length)
+    #     maintenances["line_id"] = hazards["line_id"]
+    #
+    #     return hazards, maintenances
 
     def get_prod_types(self):
         types = self.observation_space.gen_type

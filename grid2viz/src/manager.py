@@ -337,9 +337,10 @@ def make_network_scenario_overview(episode,timestep=0):
         .max()
         .sort_index()
     )
-    lines_in_maintenance = list(
-        episode.maintenances["line_name"][episode.maintenances.value == 1].unique()
-    )
+    # lines_in_maintenance = list(
+    #     episode.maintenances["line_name"][episode.maintenances.value == 1].unique()
+    # )
+    lines_in_maintenance = []
 
     graph = make_network_matplotlib(episode)
 
@@ -436,7 +437,7 @@ def make_episode_without_decorate(agent, episode_name,save=False):
     else:
         episode_data = retrieve_episode_from_disk(episode_name, agent)
         if episode_data is not None:
-            episode_analytics = EpisodeAnalytics(episode_data, episode_name, agent)
+            episode_analytics = EpisodeAnalytics(episode_data, episode_name, agent, retrieve_agent_path(agent))
             if save:
                 episode_analytics.decorate_light_without_reboot(episode_data)
                 save_in_fs_cache(episode_name, agent, episode_analytics)
@@ -531,7 +532,7 @@ def compute_episode(episode_name, agent,with_reboot=False):
     print(f"Loading from logs agent {agent} on scenario {episode_name}...")
     beg = time.time()
     episode_data = retrieve_episode_from_disk(episode_name, agent)
-    episode_analytics = EpisodeAnalytics(episode_data, episode_name, agent)
+    episode_analytics = EpisodeAnalytics(episode_data, episode_name, agent, retrieve_agent_path(agent))
     if with_reboot:
         episode_analytics.decorate_with_reboot(episode_data)
     else:
@@ -553,6 +554,10 @@ def retrieve_episode_from_disk(episode_name, agent):
         return episode_data
     else:
         return None
+
+
+def retrieve_agent_path(agent):
+    return os.path.join(agents_dir, agent)
 
 
 def is_in_ram_cache(episode_name, agent):
@@ -675,7 +680,7 @@ def make_cache(scenarios,agents,n_cores,cache_dir,agent_selection=None):
         i = 0
         for agent_scenario in agent_scenario_list:
             agents_data.append(
-                make_episode_without_decorate(agent_scenario[0], agent_scenario[1],save=True)
+                make_episode_without_decorate(agent_scenario[0], agent_scenario[1], save=True)
             )
             i += 1
     else:

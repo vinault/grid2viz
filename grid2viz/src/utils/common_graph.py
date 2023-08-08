@@ -79,10 +79,10 @@ def environment_ts_data(kind, episode, equipments):
     if kind == "Production":
         prod_types = episode.get_prod_types()
         return EpisodeTrace.get_all_prod_trace(episode, prod_types, equipments)
-    if kind == "Hazards":
-        return EpisodeTrace.get_hazard_trace(episode, equipments)
-    if kind == "Maintenances":
-        return EpisodeTrace.get_maintenance_trace(episode, equipments)
+    # if kind == "Hazards":
+    #     return EpisodeTrace.get_hazard_trace(episode, equipments)
+    # if kind == "Maintenances":
+    #     return EpisodeTrace.get_maintenance_trace(episode, equipments)
 
 
 def agent_overflow_usage_rate_trace(episode, figure_overflow, figure_usage):

@@ -138,20 +138,20 @@ def indicator_line(scenario, study_agent, ref_agent):
                                     ),
                                 ],
                             ),
-                            html.Div(
-                                className="m-2",
-                                children=[
-                                    html.P(
-                                        id="indicator_nb_maintenances",
-                                        className="border-bottom h3 mb-0 text-right",
-                                        children=episode.nb_maintenances,
-                                    ),
-                                    html.P(
-                                        className="text-muted",
-                                        children="Number of Maintenances",
-                                    ),
-                                ],
-                            ),
+                            # html.Div(
+                            #     className="m-2",
+                            #     children=[
+                            #         html.P(
+                            #             id="indicator_nb_maintenances",
+                            #             className="border-bottom h3 mb-0 text-right",
+                            #             children=episode.nb_maintenances,
+                            #         ),
+                            #         html.P(
+                            #             className="text-muted",
+                            #             children="Number of Maintenances",
+                            #         ),
+                            #     ],
+                            # ),
                         ],
                     ),
                     html.Div(
@@ -233,26 +233,26 @@ def indicator_line(scenario, study_agent, ref_agent):
                                             )
                                         ],
                                     ),
-                                    dbc.Tab(
-                                        label="Curtailment",
-                                        children=[
-                                            dcc.Graph(
-                                                id="distribution_curtailement_action_chart",
-                                                figure=figures_distribution.curtail,
-
-                                            )
-                                        ],
-                                    ),
-                                    dbc.Tab(
-                                        label="Storage",
-                                        children=[
-                                            dcc.Graph(
-                                                id="distribution_storage_action_chart",
-                                                figure=figures_distribution.storage,
-
-                                            )
-                                        ],
-                                    ),
+                                    # dbc.Tab(
+                                    #     label="Curtailment",
+                                    #     children=[
+                                    #         dcc.Graph(
+                                    #             id="distribution_curtailement_action_chart",
+                                    #             figure=figures_distribution.curtail,
+                                    #
+                                    #         )
+                                    #     ],
+                                    # ),
+                                    # dbc.Tab(
+                                    #     label="Storage",
+                                    #     children=[
+                                    #         dcc.Graph(
+                                    #             id="distribution_storage_action_chart",
+                                    #             figure=figures_distribution.storage,
+                                    #
+                                    #         )
+                                    #     ],
+                                    # ),
                                 ]
                             ),
                         ],
@@ -465,7 +465,7 @@ def inspector_line(study_agent, scenario):
         sort_mode="multi",
         page_action="native",
         page_current=0,
-        page_size=7,
+        page_size=20,
     )
 
     return html.Div(

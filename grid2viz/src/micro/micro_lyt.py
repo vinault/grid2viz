@@ -300,42 +300,42 @@ def context_inspector_line(best_episode, study_episode):
             html.Div(
                 className="card-body col row",
                 children=[
-                    html.Div(
-                        className="col-xl-5",
-                        children=[
-                            html.H5("Environment Time Series"),
-                            dac.Radio(
-                                options=[
-                                    {"label": "Production", "value": "Production"},
-                                    {"label": "Load", "value": "Load"},
-                                    {"label": "Hazards", "value": "Hazards"},
-                                    {"label": "Maintenances", "value": "Maintenances"},
-                                ],
-                                value="Production",
-                                id="environment_choices_buttons",
-                                buttonStyle="solid",
-                            ),
-                            dac.Select(
-                                id="asset_selector",
-                                options=[
-                                    {"label": prod_name, "value": prod_name}
-                                    for prod_name in best_episode.prod_names
-                                ],
-                                value="solar",
-                                # episode.prod_names[3],#[episode.prod_names[0],episode.prod_names[1]],#[prod_name for prod_name in episode.prod_names if prod_name in ['wind','solar']],#episode.prod_names[0]
-                                mode="multiple",
-                                showArrow=True,
-                            ),
-                            dcc.Graph(
-                                id="env_charts_ts",
-                                style={"margin-top": "1em"},
-                                figure=go.Figure(
-                                    layout=layout_def, data=[dict(type="scatter")]
-                                ),
-                                config=dict(displayModeBar=False),
-                            ),
-                        ],
-                    ),
+                    # html.Div(
+                    #     className="col-xl-5",
+                    #     children=[
+                    #         html.H5("Environment Time Series"),
+                    #         dac.Radio(
+                    #             options=[
+                    #                 {"label": "Production", "value": "Production"},
+                    #                 {"label": "Load", "value": "Load"},
+                    #                 {"label": "Hazards", "value": "Hazards"},
+                    #                 {"label": "Maintenances", "value": "Maintenances"},
+                    #             ],
+                    #             value="Production",
+                    #             id="environment_choices_buttons",
+                    #             buttonStyle="solid",
+                    #         ),
+                    #         dac.Select(
+                    #             id="asset_selector",
+                    #             options=[
+                    #                 {"label": prod_name, "value": prod_name}
+                    #                 for prod_name in best_episode.prod_names
+                    #             ],
+                    #             value="solar",
+                    #             # episode.prod_names[3],#[episode.prod_names[0],episode.prod_names[1]],#[prod_name for prod_name in episode.prod_names if prod_name in ['wind','solar']],#episode.prod_names[0]
+                    #             mode="multiple",
+                    #             showArrow=True,
+                    #         ),
+                    #         dcc.Graph(
+                    #             id="env_charts_ts",
+                    #             style={"margin-top": "1em"},
+                    #             figure=go.Figure(
+                    #                 layout=layout_def, data=[dict(type="scatter")]
+                    #             ),
+                    #             config=dict(displayModeBar=False),
+                    #         ),
+                    #     ],
+                    # ),
                     html.Div(
                         className="col-xl-7",
                         children=[
@@ -386,33 +386,33 @@ def context_inspector_line(best_episode, study_episode):
         ],
     )
 
-
-all_info_line = html.Div(
-    id="all_info_line_id",
-    className="lineBlock card ",
-    children=[
-        html.H4("All"),
-        html.Div(
-            className="card-body col row",
-            children=[
-                html.Div(
-                    className="col-xl-10",
-                    children=[
-                        dt.DataTable(
-                            id="all_info_table",
-                            filter_action="native",
-                            sort_action="native",
-                            sort_mode="multi",
-                            page_action="native",
-                            page_current=0,
-                            page_size=20,
-                        )
-                    ],
-                )
-            ],
-        ),
-    ],
-)
+#
+# all_info_line = html.Div(
+#     id="all_info_line_id",
+#     className="lineBlock card ",
+#     children=[
+#         html.H4("All"),
+#         html.Div(
+#             className="card-body col row",
+#             children=[
+#                 html.Div(
+#                     className="col-xl-10",
+#                     children=[
+#                         dt.DataTable(
+#                             id="all_info_table",
+#                             filter_action="native",
+#                             sort_action="native",
+#                             sort_mode="multi",
+#                             page_action="native",
+#                             page_current=0,
+#                             page_size=20,
+#                         )
+#                     ],
+#                 )
+#             ],
+#         ),
+#     ],
+# )
 
 
 
@@ -476,7 +476,7 @@ def layout(user_selected_timestamp, study_agent, ref_agent, scenario):
                 slider_params(user_selected_timestamp, new_episode),
             ),
             context_inspector_line(best_episode, new_episode),
-            all_info_line,
+            # all_info_line,
             # modal(id_suffix="micro", is_open=open_help, header=header, body=body),
         ],
     )

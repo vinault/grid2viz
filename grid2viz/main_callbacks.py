@@ -407,7 +407,7 @@ def register_callbacks_main(app):
             if(children_pg['props']['id']=="scenario_page"):
                 children_of_interest=children_pg['props']['children'][3]['props']["children"]
             elif(children_pg['props']['id']=="overview_page"):
-                children_of_interest=children_pg['props']['children'][3]['props']["children"]
+                children_of_interest=children_pg['props']['children'][1]['props']["children"]
 
         ctx = callback_context
         url_split = url_state.split("/")
