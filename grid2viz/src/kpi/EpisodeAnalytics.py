@@ -173,6 +173,7 @@ class EpisodeAnalytics:
                 # "ren_name",
                 # "storage_name",
                 "distance",
+                "attacked_line",
                 "lines_modified",
                 "subs_modified",
                 "is_alarm",
@@ -241,6 +242,9 @@ class EpisodeAnalytics:
             enumerate(zip(episode_data.observations[:-1], episode_data.actions)),
             total=size,
         ):
+            env_act = episode_data.env_actions[time_step]
+            if any(env_act._hazards) or any(env_act._maintenance):
+                print("hazards or maintenance")
             time_stamp = self.timestamp(obs)
             (
                 action_impacts,
@@ -316,6 +320,7 @@ class EpisodeAnalytics:
                 # action_impacts.ren_name,
                 # action_impacts.storage_name,
                 distance,
+                "",
                 lines_modified,
                 subs_modified,
                 is_alarm,
@@ -341,6 +346,7 @@ class EpisodeAnalytics:
 
             target_redispatch.loc[time_step, :] = obs.target_dispatch.astype('float32')
             actual_redispatch.loc[time_step, :] = obs.actual_dispatch.astype('float32')
+
 
         load_data["timestep"] = np.repeat(timesteps, episode_data.n_loads)
         load_data["equipment_name"] = np.tile(episode_data.load_names, size).astype(str)
@@ -399,6 +405,8 @@ class EpisodeAnalytics:
                 attacks_data_table.loc[time_step, "id_lines"] = ""
             else:
                 attacks_data_table.loc[time_step, "id_lines"] = lines_modified[0]
+
+        action_data_table.loc[:, "attacked_line"] = attacks_data_table["id_lines"]
 
         return (
             load_data,
