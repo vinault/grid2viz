@@ -11,7 +11,7 @@ from grid2op.Episode import EpisodeData
 from tqdm import tqdm
 
 from . import EpisodeTrace, maintenances, consumption_profiles
-# from .env_actions import env_actions
+from .env_actions import env_actions
 
 import os
 import json
@@ -36,32 +36,32 @@ class ActionImpacts:
         action_line,
         action_subs,
         action_redisp,
-        # action_curtail,
-        # action_storage,
+        action_curtail,
+        action_storage,
         redisp_impact,
-        # curtail_impact,
-        # storage_impact,
+        curtail_impact,
+        storage_impact,
         line_name,
         sub_name,
         gen_name,
-        # ren_name,
-        # storage_name,
+        ren_name,
+        storage_name,
         action_id,
     ):
 
         self.action_line = action_line
         self.action_subs = action_subs
         self.action_redisp = action_redisp
-        # self.action_curtail=action_curtail
-        # self.action_storage = action_storage
+        self.action_curtail=action_curtail
+        self.action_storage = action_storage
         self.redisp_impact = redisp_impact
-        # self.curtail_impact=curtail_impact
-        # self.storage_impact = storage_impact
+        self.curtail_impact=curtail_impact
+        self.storage_impact = storage_impact
         self.line_name = line_name
         self.sub_name = sub_name
         self.gen_name = gen_name
-        # self.ren_name = ren_name
-        # self.storage_name = storage_name
+        self.ren_name = ren_name
+        self.storage_name = storage_name
         self.action_id = action_id
 
 
@@ -93,8 +93,8 @@ class EpisodeAnalytics:
             self.attacks_data_table,
         ) = self._make_df_from_data(episode_data)
         del self.action_space
-        # print("Hazards-Maintenances")
-        # self.hazards, self.maintenances = self._env_actions_as_df(episode_data)
+        print("Hazards-Maintenances")
+        self.hazards, self.maintenances = self._env_actions_as_df(episode_data)
         print("Computing computation intensive indicators...")
         self.total_overflow_trace = EpisodeTrace.get_total_overflow_trace(
             self, episode_data
@@ -103,12 +103,12 @@ class EpisodeAnalytics:
         self.reward_trace = EpisodeTrace.get_df_rewards_trace(self)
         self.total_overflow_ts = EpisodeTrace.get_total_overflow_ts(self, episode_data)
         self.profile_traces = consumption_profiles.profiles_traces(self)
-        # self.total_maintenance_duration = maintenances.total_duration_maintenance(self)
-        # self.nb_hazards = env_actions(self, which="hazards", kind="nb", aggr=True)
-        # self.nb_maintenances = env_actions(
-        #     self, which="maintenances", kind="nb", aggr=True
-        # )
-
+        self.total_maintenance_duration = maintenances.total_duration_maintenance(self)
+        self.nb_hazards = env_actions(self, which="hazards", kind="nb", aggr=True)
+        self.nb_maintenances = env_actions(
+            self, which="maintenances", kind="nb", aggr=True
+        )
+        print(f"{self.nb_maintenances} maintenances")
 
         end = time.time()
         print(f"end computing df: {end - beg}")
@@ -162,16 +162,16 @@ class EpisodeAnalytics:
                 "action_line",
                 "action_subs",
                 "action_redisp",
-                # "action_curtail",
-                # "action_storage",
+                "action_curtail",
+                "action_storage",
                 "redisp_impact",
-                # "curtail_impact",
-                # "storage_impact",
+                "curtail_impact",
+                "storage_impact",
                 "line_name",
                 "sub_name",
                 "gen_name",
-                # "ren_name",
-                # "storage_name",
+                "ren_name",
+                "storage_name",
                 "distance",
                 "attacked_line",
                 "lines_modified",
@@ -179,8 +179,8 @@ class EpisodeAnalytics:
                 "is_alarm",
                 "alarm_zone",
                 "gens_modified",
-                # "rens_modified",
-                # "storages_modified"
+                "rens_modified",
+                "storages_modified"
             ]
         action_data_table = pd.DataFrame(
             index=range(size),
@@ -215,23 +215,10 @@ class EpisodeAnalytics:
 
         obs_0 = episode_data.observations[0]
 
-        # True == connected, False == disconnect
-        # So that len(line_statuses) - line_statuses.sum() is the distance for lines
-        line_statuses = episode_data.observations[0].line_status
-
-        # True == sub has something on bus 2, False == everything on bus 1
-        # So that subs_on_bus2.sum() is the distance for subs
-        subs_on_bus_2 = np.repeat(False, episode_data.observations[0].n_sub)
-
-        # objs_on_bus_2 will store the id of objects connected to bus 2
-        objs_on_bus_2 = {id: [] for id in range(episode_data.observations[0].n_sub)}
-
         is_alarm=False
         if(("last_alarm" in episode_data.observations[0].__dict__.keys())):
             #if(len(episode_data.observations[1].last_alarm)>=1):
             is_alarm = (episode_data.observations[0].time_since_last_alarm[0]==0)
-        # Distance from original topology is then :
-        # len(line_statuses) - line_statuses.sum() + subs_on_bus_2.sum()
 
         gens_modified_ids = []
         actual_redispatch_previous_ts = obs_0.actual_dispatch
@@ -242,9 +229,6 @@ class EpisodeAnalytics:
             enumerate(zip(episode_data.observations[:-1], episode_data.actions)),
             total=size,
         ):
-            env_act = episode_data.env_actions[time_step]
-            if any(env_act._hazards) or any(env_act._maintenance):
-                print("hazards or maintenance")
             time_stamp = self.timestamp(obs)
             (
                 action_impacts,
@@ -253,10 +237,10 @@ class EpisodeAnalytics:
                 subs_modified,
                 gens_modified_names,
                 gens_modified_ids,
-                # ren_modified_names,
-                # ren_modified_ids,
-                # storage_modified_names,
-                # storage_modified_ids
+                ren_modified_names,
+                ren_modified_ids,
+                storage_modified_names,
+                storage_modified_ids
 
             ) = self.compute_action_impacts(
                 act, list_actions, obs, gens_modified_ids, actual_redispatch_previous_ts
@@ -288,37 +272,24 @@ class EpisodeAnalytics:
 
             pos = time_step
 
-            # attack = episode_data.attacks[pos]
-
-            # (
-            #     distance,
-            #     line_statuses,
-            #     subs_on_bus_2,
-            #     objs_on_bus_2,
-            # ) = self.get_distance_from_obs(
-            #     act, line_statuses, subs_on_bus_2, objs_on_bus_2, obs_0, attack
-            # )
-
             get_back_to_ref_state_actions = self.get_back_to_ref_state(obs)
-            distance = 0
             distance = sum(len(action_list) for action_list in get_back_to_ref_state_actions.values())
-            # distance = len(action_space.get_back_to_ref_state(obs))
 
             action_data_table.loc[pos, cols_loop_action_data_table] = [
                 action_impacts.action_id,
                 action_impacts.action_line,
                 action_impacts.action_subs,
                 action_impacts.action_redisp,
-                # action_impacts.action_curtail,
-                # action_impacts.action_storage,
+                action_impacts.action_curtail,
+                action_impacts.action_storage,
                 action_impacts.redisp_impact,
-                # action_impacts.curtail_impact,
-                # action_impacts.storage_impact,
+                action_impacts.curtail_impact,
+                action_impacts.storage_impact,
                 action_impacts.line_name,
                 action_impacts.sub_name,
                 action_impacts.gen_name,
-                # action_impacts.ren_name,
-                # action_impacts.storage_name,
+                action_impacts.ren_name,
+                action_impacts.storage_name,
                 distance,
                 "",
                 lines_modified,
@@ -326,8 +297,8 @@ class EpisodeAnalytics:
                 is_alarm,
                 alarm_zone,
                 gens_modified_names,
-                # ren_modified_names,
-                # storage_modified_names
+                ren_modified_names,
+                storage_modified_names
             ]
 
 
@@ -377,7 +348,6 @@ class EpisodeAnalytics:
 
         # TODO: we should give a choice to select different rewards among other rewards
         if episode_data.other_rewards:
-            computed_other_rewards = dict.fromkeys(episode_data.other_rewards[0].keys())
             if other_reward_key:
                 if other_reward_key in episode_data.other_rewards[0].keys():
                     computed_rewards["rewards"] = [
@@ -453,22 +423,22 @@ class EpisodeAnalytics:
         self.load.timestep = self.load.timestep.astype('category')
         self.load.equipement_id = self.load.equipement_id.astype('category')
 
-        # self.maintenances.line_name=self.maintenances.line_name.astype('category')
-        # self.maintenances.timestep=self.maintenances.timestep.astype('category')
-        # self.maintenances.timestamp = self.maintenances.timestamp.astype('category')
-        # self.maintenances.line_id=self.maintenances.line_id.astype('category')
-        # self.maintenances.value = self.maintenances.value.astype('bool')
-        #
-        # self.hazards.line_name = self.hazards.line_name.astype('category')
-        # self.hazards.timestep = self.hazards.timestep.astype('category')
-        # self.hazards.timestamp = self.hazards.timestamp.astype('category')
-        # self.hazards.line_id=self.hazards.line_id.astype('category')
-        # self.hazards.value = self.hazards.value.astype('bool')
+        self.maintenances.line_name=self.maintenances.line_name.astype('category')
+        self.maintenances.timestep=self.maintenances.timestep.astype('category')
+        self.maintenances.timestamp = self.maintenances.timestamp.astype('category')
+        self.maintenances.line_id=self.maintenances.line_id.astype('category')
+        self.maintenances.value = self.maintenances.value.astype('bool')
 
-        self.rho.value=self.rho.value.astype('float16')
+        self.hazards.line_name = self.hazards.line_name.astype('category')
+        self.hazards.timestep = self.hazards.timestep.astype('category')
+        self.hazards.timestamp = self.hazards.timestamp.astype('category')
+        self.hazards.line_id=self.hazards.line_id.astype('category')
+        self.hazards.value = self.hazards.value.astype('bool')
+
+        self.rho.value = self.rho.value.astype('float16')
         self.rho.equipment = self.rho.equipment.astype('category')
-        self.rho.time=self.rho.time.astype('category')
-        self.rho.timestamp=self.rho.timestamp.astype('category')
+        self.rho.time = self.rho.time.astype('category')
+        self.rho.timestamp = self.rho.timestamp.astype('category')
 
         #optimize observations with float16 instead of float32 here
         #optimize observation and action footprint a bit
@@ -603,41 +573,41 @@ class EpisodeAnalytics:
         return objs_on_bus_2
 
     # @jit(forceobj=True)
-    # def _env_actions_as_df(self, episode_data):
-    #     agent_length = len(
-    #         episode_data.actions
-    #     )  # int(episode_data.meta['nb_timestep_played'])
-    #     hazards_size = agent_length * episode_data.n_lines
-    #     cols = ["timestep", "timestamp", "line_id", "line_name", "value"]
-    #     hazards = pd.DataFrame(index=range(hazards_size), columns=["value"], dtype=int)
-    #     maintenances = hazards.copy()
-    #
-    #     for (time_step, env_act) in tqdm(
-    #         enumerate(episode_data.env_actions), total=len(episode_data.env_actions)
-    #     ):
-    #         if env_act is None:
-    #             continue
-    #
-    #         time_stamp = self.timestamp(episode_data.observations[time_step])
-    #
-    #         begin = time_step * episode_data.n_lines
-    #         end = (time_step + 1) * episode_data.n_lines - 1
-    #         hazards.loc[begin:end, "value"] = env_act._hazards.astype(int)
-    #
-    #         begin = time_step * episode_data.n_lines
-    #         end = (time_step + 1) * episode_data.n_lines - 1
-    #         maintenances.loc[begin:end, "value"] = env_act._maintenance.astype(int)
-    #
-    #     hazards["timestep"] = np.repeat(range(agent_length), episode_data.n_lines)
-    #     maintenances["timestep"] = hazards["timestep"]
-    #     hazards["timestamp"] = np.repeat(self.timestamps, episode_data.n_lines)
-    #     maintenances["timestamp"] = hazards["timestamp"]
-    #     hazards["line_name"] = np.tile(episode_data.line_names, agent_length)
-    #     maintenances["line_name"] = hazards["line_name"]
-    #     hazards["line_id"] = np.tile(range(episode_data.n_lines), agent_length)
-    #     maintenances["line_id"] = hazards["line_id"]
-    #
-    #     return hazards, maintenances
+    def _env_actions_as_df(self, episode_data):
+        agent_length = len(
+            episode_data.actions
+        )  # int(episode_data.meta['nb_timestep_played'])
+        hazards_size = agent_length * episode_data.n_lines
+        cols = ["timestep", "timestamp", "line_id", "line_name", "value"]
+        hazards = pd.DataFrame(index=range(hazards_size), columns=["value"], dtype=int)
+        maintenances = hazards.copy()
+
+        for (time_step, env_act) in tqdm(
+            enumerate(episode_data.env_actions), total=len(episode_data.env_actions)
+        ):
+            if env_act is None:
+                continue
+
+            time_stamp = self.timestamp(episode_data.observations[time_step])
+
+            begin = time_step * episode_data.n_lines
+            end = (time_step + 1) * episode_data.n_lines - 1
+            hazards.loc[begin:end, "value"] = env_act._hazards.astype(int)
+
+            begin = time_step * episode_data.n_lines
+            end = (time_step + 1) * episode_data.n_lines - 1
+            maintenances.loc[begin:end, "value"] = env_act._maintenance.astype(int)
+
+        hazards["timestep"] = np.repeat(range(agent_length), episode_data.n_lines)
+        maintenances["timestep"] = hazards["timestep"]
+        hazards["timestamp"] = np.repeat(self.timestamps, episode_data.n_lines)
+        maintenances["timestamp"] = hazards["timestamp"]
+        hazards["line_name"] = np.tile(episode_data.line_names, agent_length)
+        maintenances["line_name"] = hazards["line_name"]
+        hazards["line_id"] = np.tile(range(episode_data.n_lines), agent_length)
+        maintenances["line_id"] = hazards["line_id"]
+
+        return hazards, maintenances
 
     def get_prod_types(self):
         types = self.observation_space.gen_type
@@ -712,28 +682,27 @@ class EpisodeAnalytics:
             action, observation, gens_modified_ids, actual_dispatch_previous_ts
         )
 
-        # (
-        #     n_ren_modified,
-        #     str_ren_modified,
-        #     ren_modified_names,
-        #     ren_modified_ids,
-        #     volume_curtailed,
-        # ) = self.get_curtailment_modifications(
-        #     action, observation
-        # )
+        (
+            n_ren_modified,
+            str_ren_modified,
+            ren_modified_names,
+            ren_modified_ids,
+            volume_curtailed,
+        ) = self.get_curtailment_modifications(
+            action, observation
+        )
 
-        # (
-        #     n_storage_modified,
-        #     str_storage_modified,
-        #     storage_modified_names,
-        #     storage_modified_ids,
-        #     volume_stored,
-        #
-        # ) = self.get_storage_modifications(
-        #     action,
-        #     observation
-        # )
+        (
+            n_storage_modified,
+            str_storage_modified,
+            storage_modified_names,
+            storage_modified_ids,
+            volume_stored,
 
+        ) = self.get_storage_modifications(
+            action,
+            observation
+        )
 
         action_id, list_actions = self.get_action_id(action, list_actions)
 
@@ -742,16 +711,16 @@ class EpisodeAnalytics:
                 action_line=n_lines_modified,
                 action_subs=n_subs_modified,
                 action_redisp=n_gens_modified,
-                # action_curtail=n_ren_modified,
-                # action_storage=n_storage_modified,
+                action_curtail=n_ren_modified,
+                action_storage=n_storage_modified,
                 redisp_impact=redisp_volume,
-                # curtail_impact=volume_curtailed,
-                # storage_impact=volume_stored,
+                curtail_impact=volume_curtailed,
+                storage_impact=volume_stored,
                 line_name=str_lines_modified,
                 sub_name=str_subs_modified,
                 gen_name=str_gens_modified,
-                # ren_name=str_ren_modified,
-                # storage_name=str_storage_modified,
+                ren_name=str_ren_modified,
+                storage_name=str_storage_modified,
                 action_id=action_id,
             ),
             list_actions,
@@ -759,10 +728,10 @@ class EpisodeAnalytics:
             subs_modified,
             gens_modified_names,
             gens_modified_ids,
-            # ren_modified_names,
-            # ren_modified_ids,
-            # storage_modified_names,
-            # storage_modified_ids
+            ren_modified_names,
+            ren_modified_ids,
+            storage_modified_names,
+            storage_modified_ids
         )
 
     def get_lines_modifications(self, action):
@@ -875,8 +844,6 @@ class EpisodeAnalytics:
 
         str_gens_modified = " - ".join(gens_modified_names)
 
-
-
         return (
             n_gens_modified,
             str_gens_modified,
@@ -884,6 +851,7 @@ class EpisodeAnalytics:
             gens_modified_ids,
             volume_redispatched,
         )
+
 
     def get_curtailment_modifications(
         self,

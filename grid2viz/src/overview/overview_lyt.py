@@ -43,7 +43,7 @@ layout_pie = {
 }
 
 
-def indicators_line(encoded_image):
+def indicators_line(encoded_image=None):
     return html.Div(
         id="indicator_line",
         children=[
@@ -147,19 +147,19 @@ def indicators_line(encoded_image):
                         ],
                         className="col-xl-3 align-self-center",
                     ),
-                    html.Div(
-                        [
-                            html.H5(
-                                "Max prod & laod values and dashed lines in maintenance on Power grid",
-                                style={"margin-top": "2%"},
-                            ),
-                            #dcc.Graph(id="network_actions", figure=encoded_image),
-                            html.Img(
-                                src="data:image/png;base64,{}".format(encoded_image)
-                            ),
-                        ],
-                        className="col-xl-8",
-                    ),
+                    # html.Div(
+                    #     [
+                    #         html.H5(
+                    #             "Max prod & laod values and dashed lines in maintenance on Power grid",
+                    #             style={"margin-top": "2%"},
+                    #         ),
+                    #         #dcc.Graph(id="network_actions", figure=encoded_image),
+                    #         html.Img(
+                    #             src="data:image/png;base64,{}".format(encoded_image)
+                    #         ),
+                    #     ],
+                    #     className="col-xl-8",
+                    # ),
                 ],
                 className="card-body row",
             ),
@@ -331,19 +331,19 @@ def layout(scenario, ref_agent):
         ref_agent = agent_scenario[scenario][0]
 
     #fig = plt.figure()
-    make_network_scenario_overview(episode)
+    # make_network_scenario_overview(episode)
 #
     ## /!\ As of 2020/10/29 the mpl_to_plotly functions is broken and not maintained
     ## It calls a deprecated function of matplotlib.
     ## Work around below : insert the image.
     ## https://stackoverflow.com/questions/63120058/plotly-mpl-to-plotly-error-spine-object-has-no-attribute-is-frame-like
-    buf = io.BytesIO()
+    # buf = io.BytesIO()
     #plt.figure(network_graph.number)
     #plt.close(fig)
-    plt.savefig(buf, format="png")
-    buf.seek(0)
-    encoded_image = base64.b64encode(buf.read())
-    buf.close()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    # encoded_image = base64.b64encode(buf.read())
+    # buf.close()
 #
     open_help = should_help_open(
         Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("overview")
@@ -358,7 +358,7 @@ def layout(scenario, ref_agent):
         id="overview_page",
         children=[
             dcc.Store(id="relayoutStoreOverview"),
-            indicators_line(encoded_image.decode()),
+            indicators_line(),
             # summary_line(episode, ref_agent, scenario),
             # ref_agent_line,
             # modal(id_suffix="overview", is_open=open_help, header=header, body=body),

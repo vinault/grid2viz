@@ -215,49 +215,49 @@ def register_callbacks_micro(app):
 
         return figures
 
-    # # flux line callback
-    # @app.callback(
-    #     [Output("line_side_choices", "options"), Output("line_side_choices", "value")],
-    #     [Input("voltage_flow_choice", "value"), Input("flow_radio", "value")],
-    #     [State("agent_study", "data"), State("scenario", "data")],
-    # )
-    # def load_voltage_flow_line_choice(category, flow_choice, study_agent, scenario):
-    #     option = []
-    #     new_episode = make_episode(study_agent, scenario)
-    #
-    #     if category == "voltage":
-    #         for name in new_episode.line_names:
-    #             option.append({"label": "ex_" + name, "value": "ex_" + name})
-    #             option.append({"label": "or_" + name, "value": "or_" + name})
-    #     if category == "flow":
-    #         for name in new_episode.line_names:
-    #             if flow_choice == "active_flow":
-    #                 option.append(
-    #                     {"label": "ex_active_" + name, "value": "ex_active_" + name}
-    #                 )
-    #                 option.append(
-    #                     {"label": "or_active_" + name, "value": "or_active_" + name}
-    #                 )
-    #             if flow_choice == "current_flow":
-    #                 option.append(
-    #                     {"label": "ex_current_" + name, "value": "ex_current_" + name}
-    #                 )
-    #                 option.append(
-    #                     {"label": "or_current_" + name, "value": "or_current_" + name}
-    #                 )
-    #
-    #             if flow_choice == "flow_usage_rate":
-    #                 option.append(
-    #                     {"label": "usage_rate_" + name, "value": "usage_rate_" + name}
-    #                 )
-    #     if category == "redispatch":
-    #         option = [
-    #             {"label": gen_name, "value": gen_name}
-    #             for gen_name in new_episode.prod_names
-    #         ]
-    #
-    #     return option, [option[0]["value"]]
-    #
+    # flux line callback
+    @app.callback(
+        [Output("line_side_choices", "options"), Output("line_side_choices", "value")],
+        [Input("voltage_flow_choice", "value"), Input("flow_radio", "value")],
+        [State("agent_study", "data"), State("scenario", "data")],
+    )
+    def load_voltage_flow_line_choice(category, flow_choice, study_agent, scenario):
+        option = []
+        new_episode = make_episode(study_agent, scenario)
+
+        if category == "voltage":
+            for name in new_episode.line_names:
+                option.append({"label": "ex_" + name, "value": "ex_" + name})
+                option.append({"label": "or_" + name, "value": "or_" + name})
+        if category == "flow":
+            for name in new_episode.line_names:
+                if flow_choice == "active_flow":
+                    option.append(
+                        {"label": "ex_active_" + name, "value": "ex_active_" + name}
+                    )
+                    option.append(
+                        {"label": "or_active_" + name, "value": "or_active_" + name}
+                    )
+                if flow_choice == "current_flow":
+                    option.append(
+                        {"label": "ex_current_" + name, "value": "ex_current_" + name}
+                    )
+                    option.append(
+                        {"label": "or_current_" + name, "value": "or_current_" + name}
+                    )
+
+                if flow_choice == "flow_usage_rate":
+                    option.append(
+                        {"label": "usage_rate_" + name, "value": "usage_rate_" + name}
+                    )
+        if category == "redispatch":
+            option = [
+                {"label": gen_name, "value": gen_name}
+                for gen_name in new_episode.prod_names
+            ]
+
+        return option, [option[0]["value"]]
+
     @app.callback(
         Output("voltage_flow_graph", "figure"),
         [
@@ -401,42 +401,42 @@ def register_callbacks_micro(app):
         new_episode = make_episode(study_agent, scenario)
         return common_graph.ts_graph_avail_assets(kind, new_episode)
 
-    # @app.callback(
-    #     Output("env_charts_ts", "figure"),
-    #     [
-    #         Input("asset_selector", "value"),
-    #         Input("relayoutStoreMicro", "data"),
-    #         Input("window", "data"),
-    #     ],
-    #     [
-    #         State("env_charts_ts", "figure"),
-    #         State("environment_choices_buttons", "value"),
-    #         State("scenario", "data"),
-    #         State("agent_study", "data"),
-    #     ],
-    # )
-    # def load_context_data(
-    #     equipments, relayout_data_store, window, figure, kind, scenario, agent_study
-    # ):
-    #     if relayout_data_store is not None and relayout_data_store["relayout_data"]:
-    #         relayout_data = relayout_data_store["relayout_data"]
-    #         layout = figure["layout"]
-    #         new_axis_layout = get_axis_relayout(figure, relayout_data)
-    #         if new_axis_layout is not None:
-    #             layout.update(new_axis_layout)
-    #             return figure
-    #
-    #     if kind is None:
-    #         return figure
-    #     if isinstance(equipments, str):
-    #         equipments = [equipments]  # to make pd.series.isin() work
-    #     episode = make_episode(agent_study, scenario)
-    #     figure["data"] = common_graph.environment_ts_data(kind, episode, equipments)
-    #
-    #     if window is not None:
-    #         figure["layout"].update(xaxis=dict(range=window, autorange=False))
-    #
-    #     return figure
+    @app.callback(
+        Output("env_charts_ts", "figure"),
+        [
+            Input("asset_selector", "value"),
+            Input("relayoutStoreMicro", "data"),
+            Input("window", "data"),
+        ],
+        [
+            State("env_charts_ts", "figure"),
+            State("environment_choices_buttons", "value"),
+            State("scenario", "data"),
+            State("agent_study", "data"),
+        ],
+    )
+    def load_context_data(
+        equipments, relayout_data_store, window, figure, kind, scenario, agent_study
+    ):
+        if relayout_data_store is not None and relayout_data_store["relayout_data"]:
+            relayout_data = relayout_data_store["relayout_data"]
+            layout = figure["layout"]
+            new_axis_layout = get_axis_relayout(figure, relayout_data)
+            if new_axis_layout is not None:
+                layout.update(new_axis_layout)
+                return figure
+
+        if kind is None:
+            return figure
+        if isinstance(equipments, str):
+            equipments = [equipments]  # to make pd.series.isin() work
+        episode = make_episode(agent_study, scenario)
+        figure["data"] = common_graph.environment_ts_data(kind, episode, equipments)
+
+        if window is not None:
+            figure["layout"].update(xaxis=dict(range=window, autorange=False))
+
+        return figure
 
     @app.callback(
         [Output("overflow_ts", "figure"), Output("usage_rate_ts", "figure")],

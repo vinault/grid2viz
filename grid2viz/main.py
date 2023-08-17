@@ -249,7 +249,7 @@ if __name__ == "__main__":
     main(
         use_fnc_args=True,
         env_path=r"C:\Users\vrenault\data_grid2op\l2rpn_idf_2023",
-        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_small",
+        agents_path=r"D:\l2rpn\grid2viz\agents\agent_runner_new_tutor",
         config_path=r"D:\l2rpn\grid2viz\grid2viz\config.ini",
         warm_start=False,
         warm_start_params={
@@ -261,5 +261,5 @@ if __name__ == "__main__":
             "time_step": 0
         },
         cache_only=True,
-        n_cores=1
+        n_cores=2
     )

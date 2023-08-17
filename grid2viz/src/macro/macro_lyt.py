@@ -31,11 +31,8 @@ def indicator_line(scenario, study_agent, ref_agent):
 
     network_graph = make_network_agent_overview(episode)
 
-    # actions_table = episode.action_data_table[
-    #     ["action_line", "action_subs", "action_redisp","action_curtail"]
-    # ]
     actions_table = episode.action_data_table[
-        ["action_line", "action_subs", "action_redisp"]
+        ["action_line", "action_subs", "action_redisp","action_curtail"]
     ]
     nb_actions=(actions_table>0).sum()
 
@@ -56,7 +53,7 @@ def indicator_line(scenario, study_agent, ref_agent):
                         nb_actions["action_line"],
                         nb_actions["action_subs"],
                         nb_actions["action_redisp"],
-                        0
+                        nb_actions["action_curtail"]
                     ],
                     sort=False,
                 )
@@ -138,20 +135,20 @@ def indicator_line(scenario, study_agent, ref_agent):
                                     ),
                                 ],
                             ),
-                            # html.Div(
-                            #     className="m-2",
-                            #     children=[
-                            #         html.P(
-                            #             id="indicator_nb_maintenances",
-                            #             className="border-bottom h3 mb-0 text-right",
-                            #             children=episode.nb_maintenances,
-                            #         ),
-                            #         html.P(
-                            #             className="text-muted",
-                            #             children="Number of Maintenances",
-                            #         ),
-                            #     ],
-                            # ),
+                            html.Div(
+                                className="m-2",
+                                children=[
+                                    html.P(
+                                        id="indicator_nb_maintenances",
+                                        className="border-bottom h3 mb-0 text-right",
+                                        children=episode.nb_maintenances,
+                                    ),
+                                    html.P(
+                                        className="text-muted",
+                                        children="Number of Maintenances",
+                                    ),
+                                ],
+                            ),
                         ],
                     ),
                     html.Div(
@@ -233,26 +230,26 @@ def indicator_line(scenario, study_agent, ref_agent):
                                             )
                                         ],
                                     ),
-                                    # dbc.Tab(
-                                    #     label="Curtailment",
-                                    #     children=[
-                                    #         dcc.Graph(
-                                    #             id="distribution_curtailement_action_chart",
-                                    #             figure=figures_distribution.curtail,
-                                    #
-                                    #         )
-                                    #     ],
-                                    # ),
-                                    # dbc.Tab(
-                                    #     label="Storage",
-                                    #     children=[
-                                    #         dcc.Graph(
-                                    #             id="distribution_storage_action_chart",
-                                    #             figure=figures_distribution.storage,
-                                    #
-                                    #         )
-                                    #     ],
-                                    # ),
+                                    dbc.Tab(
+                                        label="Curtailment",
+                                        children=[
+                                            dcc.Graph(
+                                                id="distribution_curtailement_action_chart",
+                                                figure=figures_distribution.curtail,
+
+                                            )
+                                        ],
+                                    ),
+                                    dbc.Tab(
+                                        label="Storage",
+                                        children=[
+                                            dcc.Graph(
+                                                id="distribution_storage_action_chart",
+                                                figure=figures_distribution.storage,
+
+                                            )
+                                        ],
+                                    ),
                                 ]
                             ),
                         ],
@@ -587,41 +584,35 @@ def action_distrubtion(episode, ref_episode):
             y_max = max(map(max_or_zero, [trace.y for trace in actions_redisp])) + 1
 
     ###########
-    # actions_curtail = actions_model.get_action_curtail(episode)
-    # actions_curtail.append(actions_model.get_action_curtail(ref_episode)[0])
-    #
-    # if len(actions_curtail[0]["y"]) == 0:
-    #     figure_curtail = go.Figure(
-    #         layout=layout_no_data("No curtailment actions for this Agent")
-    #     )
-    # else:
-    #     figure_curtail = go.Figure(layout=layout_def, data=actions_curtail)
-    #     if y_max is None:
-    #         y_max = max(map(max_or_zero, [trace.y for trace in actions_curtail])) + 1
-    #     if max(map(max_or_zero, [trace.y for trace in actions_curtail])) > y_max:
-    #         y_max = max(map(max_or_zero, [trace.y for trace in actions_curtail])) + 1
-    figure_curtail = go.Figure(
-        layout=layout_no_data("No curtailment actions for this Agent")
-    )
+    actions_curtail = actions_model.get_action_curtail(episode)
+    actions_curtail.append(actions_model.get_action_curtail(ref_episode)[0])
+
+    if len(actions_curtail[0]["y"]) == 0:
+        figure_curtail = go.Figure(
+            layout=layout_no_data("No curtailment actions for this Agent")
+        )
+    else:
+        figure_curtail = go.Figure(layout=layout_def, data=actions_curtail)
+        if y_max is None:
+            y_max = max(map(max_or_zero, [trace.y for trace in actions_curtail])) + 1
+        if max(map(max_or_zero, [trace.y for trace in actions_curtail])) > y_max:
+            y_max = max(map(max_or_zero, [trace.y for trace in actions_curtail])) + 1
 
     ###
-    # actions_storage = actions_model.get_action_storage(episode)
-    # actions_storage.append(actions_model.get_action_storage(ref_episode)[0])
-    #
-    # if len(actions_curtail[0]["y"]) == 0:
-    #     figure_storage = go.Figure(
-    #         layout=layout_no_data("No storage actions for this Agent")
-    #     )
-    # else:
-    #     figure_storage = go.Figure(layout=layout_def, data=actions_storage)
-    #     if y_max is None:
-    #         y_max = max(map(max_or_zero, [trace.y for trace in actions_storage])) + 1
-    #     if max(map(max_or_zero, [trace.y for trace in actions_storage])) > y_max:
-    #         y_max = max(map(max_or_zero, [trace.y for trace in actions_storage])) + 1
+    actions_storage = actions_model.get_action_storage(episode)
+    actions_storage.append(actions_model.get_action_storage(ref_episode)[0])
 
-    figure_storage = go.Figure(
-        layout=layout_no_data("No storage actions for this Agent")
-    )
+    if len(actions_curtail[0]["y"]) == 0:
+        figure_storage = go.Figure(
+            layout=layout_no_data("No storage actions for this Agent")
+        )
+    else:
+        figure_storage = go.Figure(layout=layout_def, data=actions_storage)
+        if y_max is None:
+            y_max = max(map(max_or_zero, [trace.y for trace in actions_storage])) + 1
+        if max(map(max_or_zero, [trace.y for trace in actions_storage])) > y_max:
+            y_max = max(map(max_or_zero, [trace.y for trace in actions_storage])) + 1
+
 
     if y_max:
         figure_subs.update_yaxes(range=[0, y_max])

@@ -131,8 +131,7 @@ def register_callbacks_macro(app):
         )
 
         overflow_figure["data"] = episode.total_overflow_trace.copy()
-        # for event in ["maintenance", "hazard", "attacks"]:
-        for event in ["attacks"]:
+        for event in ["maintenance", "hazard", "attacks"]:
             func = getattr(EpisodeTrace, f"get_{event}_trace")
             traces = func(episode, ["total"])
             if len(traces) > 0:
@@ -154,27 +153,24 @@ def register_callbacks_macro(app):
             new_dispatch_action_fig
         )
 
-    # @app.callback(
-    #     Output("agent_study_pie_chart", "figure"),
-    #     [Input("agent_study", "data")],
-    #     [State("select_study_agent", "disabled"),
-    #     State("agent_study_pie_chart", "figure"), State("scenario", "data")],
-    # )
-    # def update_action_repartition_pie(study_agent,disabled, figure, scenario):
-    #     if disabled:
-    #         raise PreventUpdate
-    #     new_episode = make_episode(study_agent, scenario)
-    #     figure = action_repartition_pie(new_episode)
-    #
-    #     return figure
+    @app.callback(
+        Output("agent_study_pie_chart", "figure"),
+        [Input("agent_study", "data")],
+        [State("select_study_agent", "disabled"),
+        State("agent_study_pie_chart", "figure"), State("scenario", "data")],
+    )
+    def update_action_repartition_pie(study_agent,disabled, figure, scenario):
+        if disabled:
+            raise PreventUpdate
+        new_episode = make_episode(study_agent, scenario)
+        figure = action_repartition_pie(new_episode)
+
+        return figure
 
     def action_repartition_pie(episode):
 
-        # actions_table = episode.action_data_table[
-        #     ["action_line", "action_subs", "action_redisp", "action_curtail","action_storage"]
-        # ]
         actions_table = episode.action_data_table[
-            ["action_line", "action_subs", "action_redisp"]
+            ["action_line", "action_subs", "action_redisp", "action_curtail","action_storage"]
         ]
         nb_actions = (actions_table > 0).sum()
 
@@ -196,8 +192,8 @@ def register_callbacks_macro(app):
                             nb_actions["action_line"],
                             nb_actions["action_subs"],
                             nb_actions["action_redisp"],
-                            0,
-                            0
+                            nb_actions["action_curtail"],
+                            nb_actions["action_storage"]
                         ],
                         sort=False
                     )
@@ -259,7 +255,7 @@ def register_callbacks_macro(app):
             Output("indicator_survival_time", "children"),
             Output("indicator_nb_overflow", "children"),
             Output("indicator_nb_action", "children"),
-            # Output("indicator_nb_maintenances", "children"),
+            Output("indicator_nb_maintenances", "children"),
         ],
         [
          Input("agent_study", "data"), Input("scenario", "data")],
@@ -275,9 +271,9 @@ def register_callbacks_macro(app):
         )
         nb_overflow = f"{get_nb_overflow_agent(new_episode):,}"
         nb_action = f"{get_nb_action_agent(new_episode):,}"
-        # nb_maintenances = f"{get_nb_maintenances(new_episode)}"
+        nb_maintenances = f"{get_nb_maintenances(new_episode)}"
 
-        return score, survival_time, nb_overflow, nb_action#, nb_maintenances
+        return score, survival_time, nb_overflow, nb_action, nb_maintenances
 
     def get_score_agent(episode):
         score = episode.meta["cumulative_reward"]
@@ -297,8 +293,8 @@ def register_callbacks_macro(app):
             episode.action_data_table[["action_line", "action_subs"]].sum(axis=1).sum()
         )
 
-    # def get_nb_maintenances(episode):
-    #     return int(episode.nb_maintenances)
+    def get_nb_maintenances(episode):
+        return int(episode.nb_maintenances)
 
     # @app.callback(
     #     Output("agent_study", "data"),

@@ -254,16 +254,16 @@ def make_layout(
                 timestamp_dropdown_value=user_timestamp[0]["value"],
                 items=items,
             ),
-            dbc.Button(
-                [dbc.Spinner(size="md", id="loading-2",fullscreen=True,
-                             children=html.Div(id="loading-output-2")), " Loading data on page ..."],  # all the scenarios..."],
-                id="loading-episode-button",
-                color="grey",
-                disabled=True,
-                #block=True,
-                className="d-grid gap-2 col-12 mx-auto",
-                style=dict()
-            ),
+            # dbc.Button(
+            #     [dbc.Spinner(size="md", id="loading-2",fullscreen=True,
+            #                  children=html.Div(id="loading-output-2")), " Loading data on page ..."],  # all the scenarios..."],
+            #     id="loading-episode-button",
+            #     color="grey",
+            #     disabled=True,
+            #     #block=True,
+            #     className="d-grid gap-2 col-12 mx-auto",
+            #     style=dict()
+            # ),
             dcc.Interval(id='loading-stepper-episode', interval=2000, n_intervals=0),
             body(page),
 

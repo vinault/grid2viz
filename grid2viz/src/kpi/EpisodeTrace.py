@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from . import observation_model
-# from .env_actions import env_actions
+from .env_actions import env_actions
 
 # colors for production share sunburst pie
 dic_colors_prod_types = {
@@ -94,73 +94,73 @@ def get_prod_share_trace(episode):
         )
     ]
 
-#
-# def get_hazard_trace(episode, equipments=None):
-#     ts_hazards_by_line = env_actions(episode, which="hazards", kind="ts", aggr=False)
-#
-#     if ts_hazards_by_line.empty:
-#         return []
-#
-#     if "total" in equipments:
-#         ts_hazards_by_line = ts_hazards_by_line.assign(
-#             total=episode.hazards.groupby("timestamp", as_index=True)["value"].sum()
-#         )
-#
-#     if equipments is not None:
-#         ts_hazards_by_line = ts_hazards_by_line.loc[:, equipments]
-#
-#     return [
-#         go.Scatter(x=ts_hazards_by_line.index, y=ts_hazards_by_line[line], name=line)
-#         for line in ts_hazards_by_line.columns
-#     ]
-#
-#
-# def get_maintenance_trace(episode, equipments=None):
-#     ts_maintenances_by_line = env_actions(
-#         episode, which="maintenances", kind="ts", aggr=False
-#     )
-#
-#     if ts_maintenances_by_line.empty:
-#         return []
-#
-#     # if equipments is not None:
-#     #   ts_maintenances_by_line = ts_maintenances_by_line.loc[:, equipments]
-#     linesEquipment = [
-#         line for line in equipments if line in ts_maintenances_by_line.columns
-#     ]
-#     traces = [
-#         go.Scatter(
-#             x=ts_maintenances_by_line.index, y=ts_maintenances_by_line[line], name=line
-#         )
-#         for line in linesEquipment
-#     ]
-#
-#     if "total" in equipments:
-#         total_maintenance = ts_maintenances_by_line.sum(axis=1)
-#         names_maintenace = [
-#             "lines"
-#             + str(
-#                 list(
-#                     episode.line_names[
-#                         ts_maintenances_by_line[episode.line_names].iloc[i].astype(bool)
-#                     ]
-#                 )
-#             )
-#             if total_maintenance[i] >= 1
-#             else ""
-#             for i in range(len(total_maintenance))
-#         ]
-#
-#         traces.append(
-#             go.Scatter(
-#                 x=ts_maintenances_by_line.index,
-#                 y=total_maintenance,
-#                 text=names_maintenace,
-#                 name="total",
-#             )
-#         )
-#
-#     return traces
+
+def get_hazard_trace(episode, equipments=None):
+    ts_hazards_by_line = env_actions(episode, which="hazards", kind="ts", aggr=False)
+
+    if ts_hazards_by_line.empty:
+        return []
+
+    if "total" in equipments:
+        ts_hazards_by_line = ts_hazards_by_line.assign(
+            total=episode.hazards.groupby("timestamp", as_index=True)["value"].sum()
+        )
+
+    if equipments is not None:
+        ts_hazards_by_line = ts_hazards_by_line.loc[:, equipments]
+
+    return [
+        go.Scatter(x=ts_hazards_by_line.index, y=ts_hazards_by_line[line], name=line)
+        for line in ts_hazards_by_line.columns
+    ]
+
+
+def get_maintenance_trace(episode, equipments=None):
+    ts_maintenances_by_line = env_actions(
+        episode, which="maintenances", kind="ts", aggr=False
+    )
+
+    if ts_maintenances_by_line.empty:
+        return []
+
+    # if equipments is not None:
+    #   ts_maintenances_by_line = ts_maintenances_by_line.loc[:, equipments]
+    linesEquipment = [
+        line for line in equipments if line in ts_maintenances_by_line.columns
+    ]
+    traces = [
+        go.Scatter(
+            x=ts_maintenances_by_line.index, y=ts_maintenances_by_line[line], name=line
+        )
+        for line in linesEquipment
+    ]
+
+    if "total" in equipments:
+        total_maintenance = ts_maintenances_by_line.sum(axis=1)
+        names_maintenace = [
+            "lines"
+            + str(
+                list(
+                    episode.line_names[
+                        ts_maintenances_by_line[episode.line_names].iloc[i].astype(bool)
+                    ]
+                )
+            )
+            if total_maintenance[i] >= 1
+            else ""
+            for i in range(len(total_maintenance))
+        ]
+
+        traces.append(
+            go.Scatter(
+                x=ts_maintenances_by_line.index,
+                y=total_maintenance,
+                text=names_maintenace,
+                name="total",
+            )
+        )
+
+    return traces
 
 
 def get_all_prod_trace(episode, prod_types, selection):
