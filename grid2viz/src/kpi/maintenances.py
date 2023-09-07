@@ -6,7 +6,7 @@ from .env_actions import env_actions
 
 
 def total_duration_maintenance(episode):
-    timestep_duration = episode.timestamps[1] - episode.timestamps[0]
+    timestep_duration = 5
     nb_maintenance = env_actions(
         episode, which="maintenances", kind="dur", aggr=False
     ).sum()
