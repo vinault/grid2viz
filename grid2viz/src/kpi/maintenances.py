@@ -6,11 +6,11 @@ from .env_actions import env_actions
 
 
 def total_duration_maintenance(episode):
-    timestep_duration = 5
+    timestep_duration = 300. # seconds
     nb_maintenance = env_actions(
         episode, which="maintenances", kind="dur", aggr=False
     ).sum()
-    return (timestep_duration * nb_maintenance).total_seconds() / 60.0
+    return timestep_duration * nb_maintenance / 60.0
 
 
 def hist_duration_maintenances(episode):
