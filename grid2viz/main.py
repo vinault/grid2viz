@@ -67,7 +67,7 @@ def main():
     )
     parser_main.add_argument(
         "--config-path",
-        default=None,
+        default=r"D:\Projects\grid2viz\grid2viz\config_example.ini",
         required=False,
         type=str,
         help=ARG_CONFIG_PATH_DESC,
@@ -181,10 +181,9 @@ def main():
             )
         else:
             define_layout_and_callbacks(activate_simulation=activate_beta)
+        print(page)
+        print(page)
         app_run(args.port, args.debug, page)
-
-
-
 
 
 if __name__ == "__main__":

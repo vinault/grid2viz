@@ -116,7 +116,7 @@ def indicator_line():
     )
 
 
-def card_for_network_graphs(network_graph):
+def card_for_network_graphs(network_graph, usage_rate_traces):
     return dbc.Card(
         [
             dbc.CardHeader(
@@ -132,11 +132,52 @@ def card_for_network_graphs(network_graph):
             ),
             dbc.CardBody(
                 id="card-content",
+                style={"width": "fit-content", "height": "fit-content"},
                 children=[
-                    dcc.Graph(
-                        id="interactive_graph",
-                        figure=network_graph,#dict(dict(data=network_graph["data"],layout=network_graph["layout"])),#network_graph,
-                    ),
+                    html.Div(
+                        className="row",
+                        children=[
+                            html.Div(
+                                className="col-12",
+                                children=[
+                                    dcc.Graph(
+                                        id="interactive_graph",
+                                        figure=network_graph,
+                                        # dict(dict(data=network_graph["data"],layout=network_graph["layout"])),#network_graph,
+                                    ),
+                                ]
+                            ),
+                            html.Div(
+                                className="col-6",
+                                children=[
+                                    html.H5(
+                                        "Maximum usate rate over the Network", className="text-center"
+                                    ),
+                                    dcc.Graph(
+                                        id="usage_rate_ts_network",
+                                        style={"margin-top": "1em"},
+                                        figure=go.Figure(
+                                            layout=layout_def,
+                                            data=usage_rate_traces,
+                                        ),
+                                        config=dict(displayModeBar=False),
+                                    ),
+                                ],
+                            ),
+                            html.Div(
+                                id="tooltip_table_micro",
+                                className="col-6 more-info-table",
+                                children=[
+                                    generate_agent_icon("Reconnection Agent", "grey"),
+                                    generate_agent_icon("Redispatch Agent", "red"),
+                                    generate_agent_icon("Curtailment Agent", "red"),
+                                    generate_agent_icon("Topology Agent 1 zone", "red"),
+                                    generate_agent_icon("Topology Agent 2nd zone", "red"),
+                                    generate_agent_icon("Topology Agent 3rd zone", "grey"),
+                                ]
+                            ),
+                        ]
+                    )
                     #dcc.Interval(id='auto-stepper', interval=1000, n_intervals=0),
                     #dcc.Store(id='offset', data=0), dcc.Store(id='store', data=network_graph["data"])
                 ],
@@ -147,7 +188,7 @@ def card_for_network_graphs(network_graph):
     )
 
 
-def flux_inspector_line(network_graph=None, slider_params=None):
+def flux_inspector_line(network_graph=None, slider_params=None, usage_rate_traces=None):
     return html.Div(
         id="flux_inspector_line_id",
         className="lineBlock card",
@@ -169,7 +210,7 @@ def flux_inspector_line(network_graph=None, slider_params=None):
                                                 className="text-center",
                                                 children="Grid State evolution overtime & highlighted subs with action (yellow) - with 2 nodes (green) ",
                                             ),
-                                            card_for_network_graphs(network_graph),
+                                            card_for_network_graphs(network_graph, usage_rate_traces),
 
                                             #daq.ToggleSwitch(
                                             #    id="toggle",
@@ -209,80 +250,74 @@ def flux_inspector_line(network_graph=None, slider_params=None):
                                                     dcc.Interval(id='auto-stepper', interval=3000000, n_intervals=0),#,disabled=True),
                                                 ],
                                             ),
-                                            html.P(
-                                                id="tooltip_table_micro",
-                                                className="more-info-table",
-                                                children=[
-                                                    "Click on a row to have more info on the action"
-                                                ],
-                                            ),
+
                                         ],
                                     )
                                 ],
                             ),
-                            html.Div(
-                                className="row",
-                                children=[
-                                    html.Div(
-                                        className="col",
-                                        children=[
-                                            html.H6(
-                                                className="text-center",
-                                                children="Voltage, Flow and Redispatch time series",
-                                            ),
-                                            dac.Radio(
-                                                options=[
-                                                    {"label": "Flow", "value": "flow"},
-                                                    {
-                                                        "label": "Voltage (V)",
-                                                        "value": "voltage",
-                                                    },
-                                                    {
-                                                        "label": "Redispatch (MW)",
-                                                        "value": "redispatch",
-                                                    },
-                                                ],
-                                                value="flow",
-                                                id="voltage_flow_choice",
-                                                buttonStyle="solid",
-                                            ),
-                                            dac.Radio(
-                                                options=[
-                                                    {
-                                                        "label": "Active Flow (MW)",
-                                                        "value": "active_flow",
-                                                    },
-                                                    {
-                                                        "label": "Current Flow (A)",
-                                                        "value": "current_flow",
-                                                    },
-                                                    {
-                                                        "label": "Flow Usage Rate",
-                                                        "value": "flow_usage_rate",
-                                                    },
-                                                ],
-                                                value="active_flow",
-                                                id="flow_radio",
-                                                style={"display": "none"},
-                                            ),
-                                            dac.Select(
-                                                id="line_side_choices",
-                                                options=[],
-                                                value=[],
-                                                mode="multiple",
-                                                showArrow=True,
-                                            ),
-                                            dcc.Graph(
-                                                id="voltage_flow_graph",
-                                                figure=go.Figure(
-                                                    layout=layout_def,
-                                                    data=[dict(type="scatter")],
-                                                ),
-                                            ),
-                                        ],
-                                    ),
-                                ],
-                            ),
+                            # html.Div(
+                            #     className="row",
+                            #     children=[
+                            #         html.Div(
+                            #             className="col",
+                            #             children=[
+                            #                 html.H6(
+                            #                     className="text-center",
+                            #                     children="Voltage, Flow and Redispatch time series",
+                            #                 ),
+                            #                 dac.Radio(
+                            #                     options=[
+                            #                         {"label": "Flow", "value": "flow"},
+                            #                         {
+                            #                             "label": "Voltage (V)",
+                            #                             "value": "voltage",
+                            #                         },
+                            #                         {
+                            #                             "label": "Redispatch (MW)",
+                            #                             "value": "redispatch",
+                            #                         },
+                            #                     ],
+                            #                     value="flow",
+                            #                     id="voltage_flow_choice",
+                            #                     buttonStyle="solid",
+                            #                 ),
+                            #                 dac.Radio(
+                            #                     options=[
+                            #                         {
+                            #                             "label": "Active Flow (MW)",
+                            #                             "value": "active_flow",
+                            #                         },
+                            #                         {
+                            #                             "label": "Current Flow (A)",
+                            #                             "value": "current_flow",
+                            #                         },
+                            #                         {
+                            #                             "label": "Flow Usage Rate",
+                            #                             "value": "flow_usage_rate",
+                            #                         },
+                            #                     ],
+                            #                     value="active_flow",
+                            #                     id="flow_radio",
+                            #                     style={"display": "none"},
+                            #                 ),
+                            #                 dac.Select(
+                            #                     id="line_side_choices",
+                            #                     options=[],
+                            #                     value=[],
+                            #                     mode="multiple",
+                            #                     showArrow=True,
+                            #                 ),
+                            #                 dcc.Graph(
+                            #                     id="voltage_flow_graph",
+                            #                     figure=go.Figure(
+                            #                         layout=layout_def,
+                            #                         data=[dict(type="scatter")],
+                            #                     ),
+                            #                 ),
+                            #             ],
+                            #         ),
+                            #     ],
+                            # ),
                         ],
                     )
                 ],
@@ -453,11 +488,26 @@ def slider_params(user_selected_timestamp, episode):
     return SliderParams(min_, max_, marks, value)
 
 
+def generate_agent_icon(name, color):
+    return html.Div(
+        className="d-flex align-items-center",
+        children=[
+            html.I(className="col-1 fas fa-user-alt",
+                   style={"font-size": "40px", "color": color}),
+            html.Div(name, style={"font-size": "40px", "color": color})
+        ]
+    )
+
+
 def layout(user_selected_timestamp, study_agent, ref_agent, scenario):
     best_episode = make_episode(best_agents[scenario]["agent"], scenario)
     new_episode = make_episode(study_agent, scenario)
     center_indx = center_index(user_selected_timestamp, new_episode)
     network_graph = make_network_agent_study(new_episode, timestep=center_indx)
+    usage_rate_traces = go.Figure(data=new_episode.usage_rate_trace).data
+    for trace in usage_rate_traces:
+        trace.x = trace.x[center_indx-10:center_indx+1]
+        trace.y = trace.y[center_indx-10:center_indx+1]
 
     open_help = should_help_open(
         Path(grid2viz_home_directory) / DONT_SHOW_FILENAME("micro")
@@ -474,6 +524,7 @@ def layout(user_selected_timestamp, study_agent, ref_agent, scenario):
             flux_inspector_line(
                 network_graph,
                 slider_params(user_selected_timestamp, new_episode),
+                usage_rate_traces
             ),
             context_inspector_line(best_episode, new_episode),
             all_info_line,

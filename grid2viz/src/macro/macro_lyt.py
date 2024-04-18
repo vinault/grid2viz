@@ -534,7 +534,7 @@ def get_table(episode):
     cols_to_exclude = ["id", "lines_modified", "subs_modified"]
     return [
         {"name": i, "id": i} for i in table.columns if i not in cols_to_exclude
-    ], table.to_dict("record")
+    ], table.to_dict("records")
 
 
 ActionsDistribution = namedtuple(

@@ -326,49 +326,55 @@ def get_usage_rate_trace(episode):
     df = observation_model.get_usage_rate(episode)
     line = {"shape": "spline", "width": 0, "smoothing": 1}
     trace = [
-        go.Scatter(
-            x=df["timestamp"],
-            y=np.array(df["value"]["quantile10"].tolist()),
-            name="quantile 10",
-            line=line,
-        ),
-        go.Scatter(
-            x=df["timestamp"],
-            y=np.array(df["value"]["quantile25"].tolist()),
-            name="quantile 25",
-            fill="tonexty",
-            fillcolor="rgba(159, 197, 232, 0.63)",
-            line=line,
-        ),
-        go.Scatter(
-            x=df["timestamp"],
-            y=np.array(df["value"]["median"].tolist()),
-            name="median",
-            fill="tonexty",
-            fillcolor="rgba(31, 119, 180, 0.5)",
-            line={"color": "rgb(31, 119, 180)", "shape": "spline", "smoothing": 1},
-        ),
-        go.Scatter(
-            x=df["timestamp"],
-            y=np.array(df["value"]["quantile75"].tolist()),
-            name="quantile 75",
-            fill="tonexty",
-            fillcolor="rgba(31, 119, 180, 0.5)",
-            line=line,
-        ),
-        go.Scatter(
-            x=df["timestamp"],
-            y=np.array(df["value"]["quantile90"].tolist()),
-            name="quantile 90",
-            fill="tonexty",
-            fillcolor="rgba(159, 197, 232, 0.63)",
-            line=line,
-        ),
+        # go.Scatter(
+        #     x=df["timestamp"],
+        #     y=np.array(df["value"]["quantile10"].tolist()),
+        #     name="quantile 10",
+        #     line=line,
+        #     mode="lines"
+        # ),
+        # go.Scatter(
+        #     x=df["timestamp"],
+        #     y=np.array(df["value"]["quantile25"].tolist()),
+        #     name="quantile 25",
+        #     fill="tonexty",
+        #     fillcolor="rgba(159, 197, 232, 0.63)",
+        #     line=line,
+        #     mode="lines"
+        # ),
+        # go.Scatter(
+        #     x=df["timestamp"],
+        #     y=np.array(df["value"]["median"].tolist()),
+        #     name="median",
+        #     fill="tonexty",
+        #     fillcolor="rgba(31, 119, 180, 0.5)",
+        #     line={"color": "rgb(31, 119, 180)", "shape": "spline", "smoothing": 1},
+        #     mode="lines"
+        # ),
+        # go.Scatter(
+        #     x=df["timestamp"],
+        #     y=np.array(df["value"]["quantile75"].tolist()),
+        #     name="quantile 75",
+        #     fill="tonexty",
+        #     fillcolor="rgba(31, 119, 180, 0.5)",
+        #     line=line,
+        #     mode="lines"
+        # ),
+        # go.Scatter(
+        #     x=df["timestamp"],
+        #     y=np.array(df["value"]["quantile90"].tolist()),
+        #     name="quantile 90",
+        #     fill="tonexty",
+        #     fillcolor="rgba(159, 197, 232, 0.63)",
+        #     line=line,
+        #     mode="lines"
+        # ),
         go.Scatter(
             x=df["timestamp"],
             y=np.array(df["value"]["max"].tolist()),
             name="Max",
             line={"shape": "spline", "smoothing": 1, "color": "rgba(255,0,0,0.5)"},
+            mode="lines"
         ),
     ]
     return trace

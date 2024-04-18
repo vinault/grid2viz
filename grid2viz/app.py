@@ -102,4 +102,4 @@ def app_run(port=8050, debug=False, page=None):
 
 
 if __name__ == "__main__":
-    app_run()
+    app_run(port=8050, page="micro")

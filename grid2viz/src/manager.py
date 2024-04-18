@@ -44,8 +44,8 @@ def add_substation_color_matplot(subs, plot_helper, fig):
     return fig
 
 
-def add_substation_color_plotly(subs, plot_helper, fig, color="gold"):
-    radius_size = int(plot_helper._sub_radius * 0.8)
+def add_substation_color_plotly(subs, plot_helper, fig, color="red", symbol="circle"):
+    radius_size = int(plot_helper._sub_radius * 2)
 
     for id_sub in subs:
         subName = "sub_" + str(id_sub)
@@ -54,8 +54,9 @@ def add_substation_color_plotly(subs, plot_helper, fig, color="gold"):
         marker_dict = dict(
             size=radius_size,
             color=color,
+            symbol=symbol,
             showscale=False,
-            opacity=0.5,
+            opacity=0.8,
         )
         fig.add_trace(
             go.Scatter(
@@ -109,7 +110,12 @@ def make_network(episode, responsive=True):
         graph = PlotPlotly(
             grid_layout=episode.observation_space.grid_layout,
             observation_space=episode.observation_space,
-            responsive=responsive,
+            # responsive=False,
+            load_radius=0,
+            gen_radius=0,
+            sub_radius=12,
+            width=1800,
+            # height=900,
         )
     return graph
 
@@ -132,7 +138,7 @@ def make_network_matplotlib(episode,timestep=0):
 # so we have to define it differently from the global graph in make_network that we don't use here
 import base64
 import io
-def make_network_agent_study(episode, timestep, figure_obs=None, responsive=False,redraw=False):
+def make_network_agent_study(episode, timestep, figure_obs=None, responsive=False,redraw=False, draw_loads=False):
     # subs_on_bus_2 = np.repeat(False, episode_data.observations[0].n_sub)
     #graph=None
     #if(isMatplotLib):########not working for now. Was trying to use matplotlib to accelerate ploting time
@@ -154,8 +160,25 @@ def make_network_agent_study(episode, timestep, figure_obs=None, responsive=Fals
     observation=episode.observations[timestep]
 
     graph=make_network(episode, responsive)
-    graph._sub_radius = 30  # instead of 25 by default
-    graph._bus_radius = 10  # instead of 4 by default
+    graph._sub_radius = 12  # instead of 25 by default
+    graph._bus_radius = 7  # instead of 4 by default
+    if draw_loads:
+        # graph._load_radius = 8
+        graph._load_fill_color = "orange"
+        graph._load_line_width = 1
+
+        # graph._gen_radius = 8
+        graph._gen_fill_color = "blue"
+        graph._gen_line_width = 1
+    else:
+
+        graph._load_fill_color = "white"
+        graph._load_line_width = 0
+
+        graph._gen_fill_color = "white"
+        graph._gen_line_width = 0
+
+
     if(figure_obs)and not redraw:# don't redraw it from scratch, just change what is needed
 
         import plotly.colors as pc
@@ -180,8 +203,8 @@ def make_network_agent_study(episode, timestep, figure_obs=None, responsive=Fals
                 capacity = np.clip(rho, 0.0, 1.0)
                 color = color_scheme[int(capacity * float(len(color_scheme) - 1))]
                 trace["line"]['color']=str(color)
-                if(previous_trace) and ("text" in previous_trace.keys()):
-                    previous_trace["text"]=[str(np.round(rho*100,2))+" %"]
+                # if(previous_trace) and ("text" in previous_trace.keys()):
+                #     previous_trace["text"]=[str(np.round(rho*100,2))+" %"]
 
                 id_line+=1
             i_traces+=1
@@ -218,10 +241,27 @@ def make_network_agent_study(episode, timestep, figure_obs=None, responsive=Fals
         #        observation_space=episode.observation_space,
         #        responsive=responsive,
         #    )
-        fig = graph.plot_obs(episode.observations[timestep])#,redraw=redraw,figure=figure_obs)
-
+        fig = graph.plot_obs(episode.observations[timestep], line_info=None)#,redraw=redraw,figure=figure_obs)
+        # full_fig = fig.full_figure_for_development()
+        # print(full_fig.layout.xaxis.range)
+        # fig.update_layout(
+        #     xaxis=dict(range=[-200, 1200]),
+        #     yaxis=dict(range=[-200, 800])
+        # )
 
     ##########
+    # coloring subs not in reference topologie
+    nb_bus_subs = [
+        episode.observations[timestep].state_of(substation_id=i)["nb_bus"]
+        for i in range(episode.observations[timestep].n_sub)
+    ]
+    sub_2buses = [
+        i for i in range(episode.observations[timestep].n_sub) if nb_bus_subs[i] >= 2
+    ]
+    fig = add_substation_color_plotly(
+        sub_2buses, graph, fig, color="darkgreen", symbol="square"
+    )  # also other color for subs not in ref topo
+
     # We color subs where we had actions
     sub_name_modified = list(
         itertools.chain.from_iterable(episode.action_data_table.subs_modified)
@@ -232,17 +272,6 @@ def make_network_agent_study(episode, timestep, figure_obs=None, responsive=Fals
     ]
     fig = add_substation_color_plotly(sub_id_modified, graph,fig)
 
-    # coloring subs not in reference topologie
-    nb_bus_subs = [
-        episode.observations[timestep].state_of(substation_id=i)["nb_bus"]
-        for i in range(episode.observations[timestep].n_sub)
-    ]
-    sub_2buses = [
-        i for i in range(episode.observations[timestep].n_sub) if nb_bus_subs[i] >= 2
-    ]
-    fig = add_substation_color_plotly(
-        sub_2buses, graph, fig, color="green"
-    )  # also other color for subs not in ref topo
 
     if ("is_alarm" in episode.action_data_table.columns):
         alarms_lines_area = episode.observations[timestep].alarms_lines_area
