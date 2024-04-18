@@ -524,7 +524,9 @@ def register_callbacks_micro(app):
         episode = make_episode(
             agent_study if active_tab == "tab-0" else agent_ref, scenario
         )
+        episode_ref = make_episode(agent_ref, scenario)
         usage_rate_traces = go.Figure(data=episode.usage_rate_trace).data
+        us_traces_ref = go.Figure(data=episode_ref.usage_rate_trace).data
         try:
             act = episode.actions[slider_value]
         except:# Grid2OpException as ex:
@@ -616,6 +618,13 @@ def register_callbacks_micro(app):
         for trace in usage_rate_traces:
             trace.x = trace.x[slider_min:slider_value + 1]
             trace.y = trace.y[slider_min:slider_value + 1]
+            trace.name = "RL Agent max usage rate"
+            new_fig.add_trace(trace)
+        for trace in us_traces_ref:
+            trace.x = trace.x[slider_min:slider_value + 1]
+            trace.y = trace.y[slider_min:slider_value + 1]
+            trace.line = {"shape": "spline", "smoothing": 1, "color": "blue"}
+            trace.name = "Expert Agent max usage rate"
             new_fig.add_trace(trace)
         # attacks_traces = get_attacks_trace(episode, ["total"])
         # if len(attacks_traces) > 0:
